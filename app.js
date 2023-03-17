@@ -3,6 +3,7 @@
 // DOM elements and variables
 const input = document.querySelector('input[type=file]');
 const output = document.querySelector('#output');
+const preview = document.querySelector('.preview');
 let latDMS, latRef, latitude, longDMS, longRef, longitude;
 const defaultCoords = [-77.041493, 38.930859];
 
@@ -63,9 +64,14 @@ function getExifData(file) {
 }
 
 // Async function to get routing data from graphhopper. Called after extracting photo EXIF data
-async function getRoute({ latitude, longitude }) {
+async function getRoute(imageCoordsArray) {
+  const pointArray = imageCoordsArray.map(({ latitude, longitude }) => [
+    +longitude,
+    +latitude,
+  ]);
+  console.log(pointArray)
   const query = new URLSearchParams({
-    key: 'db56c0cf-613e-456d-baea-46650066da62',
+    key: 'db56c0cf-613e-456d-baea-46650066da62', // remove from github
   }).toString();
 
   const resp = await fetch(`https://graphhopper.com/api/1/route?${query}`, {
@@ -74,25 +80,39 @@ async function getRoute({ latitude, longitude }) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      points: [[+longitude, +latitude], defaultCoords],
+      points: pointArray,
       points_encoded: false,
     }),
   });
   const data = await resp.json();
-  return data
+  return data;
 }
 
 function drawRoute(routeData) {
-  const routeCoords = routeData.paths[0].points.coordinates.map((coords) =>  [coords[1], coords[0]]);  
+  const routeCoords = routeData.paths[0].points.coordinates.map((coords) => [
+    coords[1],
+    coords[0],
+  ]);
   L.polyline(routeCoords).addTo(map);
+}
+
+// Function to print image, info and coords to preview area
+function updateImagePreviewDisplay() {
+  // while(preview.firstChild){
+  //   removechild(preview.firstChild)
+  // }
 }
 
 // Event handler to run all functions on image and image data
 input.addEventListener('change', async () => {
-  const [file] = input.files;
-  if (!file) return;
-  const imageCoords = await getExifData(file);
-  renderCoordinates(imageCoords);
-  const routeData = await getRoute(imageCoords);
-  drawRoute(routeData)
+  const fileList = input.files;
+  if (!fileList.length) return;
+  const imageCoordsArray = [];
+  for (const file of fileList) {
+    const imageCoords = await getExifData(file);
+    renderCoordinates(imageCoords);
+    imageCoordsArray.push(imageCoords);
+  }
+  const routeData = await getRoute(imageCoordsArray);
+  drawRoute(routeData);
 });

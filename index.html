@@ -7,8 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Styles - normalize and external css for now -->
-  <link rel="stylesheet" type="text/css" href="https://unpkg.com/modern-css-reset/dist/reset.min.css" />
-  <link rel="stylesheet" type="text/css" href="https://unpkg.com/mvp.css@1.12/mvp.css">
   <link rel="stylesheet" type="text/css" href="./styles.css">
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
@@ -23,15 +21,21 @@
 </head>
 
 <body>
-  <h1>Snappy Trails</h1>
   <main>
-    <form id="upload-form">
-      <label for="fileInput" multiple>Upload pics here</label>
-      <input type="file" id="fileInput" accept=".jpg, .jpeg, .tiff" multiple />
-      <div id="output"></div>
-    </form>
+    <section class="sidebar">
+      <h1>Snappy Trails</h1>
+      <form id="upload-form">
+        <p>Upload one or more images to start routing here</p>
+        <label for="fileInput">Upload images</label>
+        <input type="file" multiple id="fileInput" accept=".jpg, .jpeg, .tiff" multiple />
+        <div id="output"></div>
+      </form>
+      <div class="preview"></div>
+    </section>
+    <section class="carto">
+      <div id="map"></div>
+    </section>
   </main>
-  <div id="map"></div>
 
 </body>
 
