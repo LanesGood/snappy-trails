@@ -8,6 +8,9 @@
 
   <!-- Styles - normalize and external css for now -->
   <link rel="stylesheet" type="text/css" href="./styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
@@ -26,13 +29,13 @@
   <main>
     <section class="sidebar">
       <h1>Snappy Trails</h1>
+      <p>Upload up to 10 images to find your trail</p>
       <form id="upload-form">
-        <p>Upload one or more images to start routing here</p>
-        <label for="fileInput">Upload images</label>
+        <label for="fileInput">Select images</label>
         <input type="file" multiple id="fileInput" accept=".jpg, .jpeg, .tiff" multiple />
-        <button type="submit" id="submit-route">Submit</button>
+        <div id="preview"></div>
+        <button type="submit" id="submit-route-btn">Submit</button>
       </form>
-      <div id="preview"></div>
     </section>
     <section class="carto">
       <div id="map"></div>

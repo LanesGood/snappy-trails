@@ -2,7 +2,7 @@
 
 // DOM elements and variables
 const input = document.querySelector('input[type=file]');
-const submit = document.querySelector('#submit-route');
+const submit = document.querySelector('#submit-route-btn');
 
 const preview = document.querySelector('#preview');
 let latDMS, latRef, latitude, longDMS, longRef, longitude;
@@ -10,34 +10,13 @@ const defaultCoords = [-77.041493, 38.930859];
 const imageCoordsArray = [];
 
 const map = L.map('map').setView([defaultCoords[1], defaultCoords[0]], 13);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution:
-    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+const Stamen_TonerLite = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+  attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  subdomains: 'abcd',
+  minZoom: 0,
+  maxZoom: 20,
+  ext: 'png'
 }).addTo(map);
-
-const terrainLayer = L.tileLayer(
-  'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}',
-  {
-    attribution:
-      'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    subdomains: 'abcd',
-    minZoom: 0,
-    maxZoom: 18,
-    ext: 'png',
-  }
-);
-
-const OpenTopoMap = L.tileLayer(
-  'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-  {
-    maxZoom: 17,
-    attribution:
-      'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-  }
-);
-
-map.addLayer(terrainLayer);
 
 // Function to convert degree minute second coordinates to decimal degrees
 function ConvertDMSToDD(degrees, minutes, seconds, direction) {
@@ -85,7 +64,6 @@ function getExifData(file) {
         Make,
         Model,
       };
-      console.log(imageData);
       resolve(imageData);
       reject(new Error('There was an error '));
     });
@@ -108,6 +86,7 @@ async function getRoute(imageCoordsArray) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
+      // profile: 'foot',
       points: pointArray,
       points_encoded: false,
     }),
@@ -127,19 +106,22 @@ function drawRoute(routeData) {
 // Function to print image, info and coords to preview area
 function renderImageInfo(file, exifData) {
   const previewCard = document.createElement('div');
+  previewCard.classList.add('preview__card');
+  const previewCardHeader = document.createElement('div');
+  previewCardHeader.classList.add('preview__card--header');
   const previewCardText = document.createElement('div');
+  previewCardText.classList.add('preview__card--text');
   const previewImage = document.createElement('img');
+  previewImage.classList.add('preview__image');
 
   // Convert image date from exif data format to javascript format
   const [year, month, day, hours, minutes, seconds] =
     exifData.DateTime.split(/[: ]/);
   const dateObject = new Date(year, month - 1, day, hours, minutes, seconds);
 
-  previewCard.classList.add('preview__card');
-  previewCardText.classList.add('preview__card--text');
-  previewImage.classList.add('preview__image');
   previewImage.src = URL.createObjectURL(file);
-  previewCard.appendChild(previewImage);
+  previewCardHeader.appendChild(previewImage);
+  previewCard.appendChild(previewCardHeader);
   previewCardText.innerHTML = `
   <h4>${file.name}</h4>
   <dl>
@@ -151,7 +133,7 @@ function renderImageInfo(file, exifData) {
     <dd>lat, lng: </dd><dt>${exifData.latitude.toFixed(
       2
     )}, ${exifData.longitude.toFixed(2)}</dt>
-    <dd>Camera:</dd><dt> ${exifData.Make}, ${exifData.Model}</dt>
+    <dd>Camera:</dd><dt> ${exifData.Make} ${exifData.Model}</dt>
   </dl>
 `;
 
@@ -180,6 +162,7 @@ input.addEventListener('change', async () => {
 submit.addEventListener('click', async (e) => {
   e.preventDefault();
   const routeData = await getRoute(imageCoordsArray);
+  console.log(routeData)
   map.flyToBounds(imageCoordsArray);
   drawRoute(routeData);
 });
