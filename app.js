@@ -2,10 +2,12 @@
 
 // DOM elements and variables
 const input = document.querySelector('input[type=file]');
+const submit = document.querySelector('#submit-route');
 const output = document.querySelector('#output');
 const preview = document.querySelector('.preview');
 let latDMS, latRef, latitude, longDMS, longRef, longitude;
 const defaultCoords = [-77.041493, 38.930859];
+const imageCoordsArray = [];
 
 const map = L.map('map').setView([defaultCoords[1], defaultCoords[0]], 13);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -134,14 +136,17 @@ function setPhotoMarker({ latitude, longitude }) {
 input.addEventListener('change', async () => {
   const fileList = input.files;
   if (!fileList.length) return;
-  const imageCoordsArray = [];
   for (const file of fileList) {
     const imageCoords = await getExifData(file);
     const { latitude, longitude } = imageCoords;
     imageCoordsArray.push([latitude, longitude]);
     renderCoordinates(imageCoords);
-    setPhotoMarker(imageCoords)
+    setPhotoMarker(imageCoords);
   }
+});
+
+submit.addEventListener('click', async (e) => {
+  e.preventDefault();
   const routeData = await getRoute(imageCoordsArray);
   map.flyToBounds(imageCoordsArray);
   drawRoute(routeData);
