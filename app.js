@@ -11,21 +11,29 @@ const map = L.map('map').setView([defaultCoords[1], defaultCoords[0]], 13);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution:
-  '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map);
 
-const terrainLayer = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
-	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-	subdomains: 'abcd',
-	minZoom: 0,
-	maxZoom: 18,
-	ext: 'png'
-});
+const terrainLayer = L.tileLayer(
+  'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}',
+  {
+    attribution:
+      'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: 'abcd',
+    minZoom: 0,
+    maxZoom: 18,
+    ext: 'png',
+  }
+);
 
-const OpenTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-	maxZoom: 17,
-	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-});
+const OpenTopoMap = L.tileLayer(
+  'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+  {
+    maxZoom: 17,
+    attribution:
+      'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+  }
+);
 
 map.addLayer(terrainLayer);
 
@@ -80,11 +88,10 @@ function getExifData(file) {
 
 // Async function to get routing data from graphhopper. Called after extracting photo EXIF data
 async function getRoute(imageCoordsArray) {
-  const pointArray = imageCoordsArray.map(({ latitude, longitude }) => [
+  const pointArray = imageCoordsArray.map(([latitude, longitude]) => [
     +longitude,
     +latitude,
   ]);
-  console.log(pointArray)
   const query = new URLSearchParams({
     key: 'db56c0cf-613e-456d-baea-46650066da62', // remove from github
   }).toString();
@@ -118,6 +125,11 @@ function updateImagePreviewDisplay() {
   // }
 }
 
+// Add marker to map for each image added
+function setPhotoMarker({ latitude, longitude }) {
+  L.marker([latitude, longitude]).addTo(map);
+}
+
 // Event handler to run all functions on image and image data
 input.addEventListener('change', async () => {
   const fileList = input.files;
@@ -125,9 +137,12 @@ input.addEventListener('change', async () => {
   const imageCoordsArray = [];
   for (const file of fileList) {
     const imageCoords = await getExifData(file);
+    const { latitude, longitude } = imageCoords;
+    imageCoordsArray.push([latitude, longitude]);
     renderCoordinates(imageCoords);
-    imageCoordsArray.push(imageCoords);
+    setPhotoMarker(imageCoords)
   }
   const routeData = await getRoute(imageCoordsArray);
+  map.flyToBounds(imageCoordsArray);
   drawRoute(routeData);
 });
