@@ -20,6 +20,7 @@ main {
   padding: 1rem;
   height: calc(100% - 2rem);
   margin: 0;
+  overflow: hidden;
 }
 .sidebar {
   padding: 1rem;
@@ -27,6 +28,7 @@ main {
   border-radius: 0.5rem;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px,
     rgba(0, 0, 0, 0.05) 0px 5px 10px;
+  overflow: auto;
 }
 .carto {
   width: 100%;
@@ -37,16 +39,58 @@ main {
 }
 #upload-form {
 }
+#preview {
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.5rem;
+}
+.preview__card {
+  max-width: 100%;
+  padding: 1rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px,
+    rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  font-size: 14px;
+}
+.preview__card--text {
+  font-size: 14px;
+}
+.preview__card--text h4 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.preview__card--text dl {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  padding: 0;
+  margin: 0;
+  gap: 0.25rem;
+}
+.preview__card--text dd {
+  padding: 0;
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: #808080;
+}
+.preview__image {
+  max-width: 100%;
+}
+.preview__image::after {
+  box-shadow: inset 3px 3px 10px 0 #000000;
+  content: '';
+  display: block;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
 .sidebar label {
   display: block;
   margin-bottom: 1rem;
-}
-#output {
-  overflow: scroll;
-  border: 1px solid black;
-  min-height: 200px;
-  margin: 1rem 0;
-  padding: 0.5rem;
 }
 
 #map {

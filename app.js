@@ -3,8 +3,8 @@
 // DOM elements and variables
 const input = document.querySelector('input[type=file]');
 const submit = document.querySelector('#submit-route');
-const output = document.querySelector('#output');
-const preview = document.querySelector('.preview');
+
+const preview = document.querySelector('#preview');
 let latDMS, latRef, latitude, longDMS, longRef, longitude;
 const defaultCoords = [-77.041493, 38.930859];
 const imageCoordsArray = [];
@@ -49,40 +49,44 @@ function ConvertDMSToDD(degrees, minutes, seconds, direction) {
   return dd;
 }
 
-// Write image GPS information to the page
-const renderCoordinates = ({
-  latRef,
-  latDMS,
-  latitude,
-  longRef,
-  longDMS,
-  longitude,
-}) => {
-  let html = `
-              <div>
-                <h4>Image 1</h4>
-                <h5>${latRef}</h5>
-                <p>${latDMS}</p>
-                <p>${latitude}</p>
-                <h5>${longRef}</h5>
-                <p>${longDMS}</p>   
-                <p>${longitude}</p>
-              </div>
-              `;
-  output.insertAdjacentHTML('afterbegin', html);
-};
-
 // Extract image EXIF data in a promise
 function getExifData(file) {
   return new Promise(function (resolve, reject) {
     EXIF.getData(file, function () {
-      latRef = EXIF.getTag(this, 'GPSLatitudeRef');
-      latDMS = EXIF.getTag(this, 'GPSLatitude');
-      longRef = EXIF.getTag(this, 'GPSLongitudeRef');
-      longDMS = EXIF.getTag(this, 'GPSLongitude');
-      latitude = ConvertDMSToDD(latDMS[0], latDMS[1], latDMS[2], latRef);
-      longitude = ConvertDMSToDD(longDMS[0], longDMS[1], longDMS[2], longRef);
-      resolve({ latRef, latDMS, latitude, longRef, longDMS, longitude });
+      const {
+        DateTime,
+        GPSImgDirection,
+        GPSImgDirectionRef,
+        GPSLatitudeRef,
+        GPSLatitude,
+        GPSLongitudeRef,
+        GPSLongitude,
+        Make,
+        Model,
+      } = EXIF.getAllTags(this);
+      latitude = ConvertDMSToDD(
+        GPSLatitude[0],
+        GPSLatitude[1],
+        GPSLatitude[2],
+        GPSLatitudeRef
+      );
+      longitude = ConvertDMSToDD(
+        GPSLongitude[0],
+        GPSLongitude[1],
+        GPSLongitude[2],
+        GPSLongitudeRef
+      );
+      const imageData = {
+        DateTime,
+        GPSImgDirection,
+        GPSImgDirectionRef,
+        latitude,
+        longitude,
+        Make,
+        Model,
+      };
+      console.log(imageData);
+      resolve(imageData);
       reject(new Error('There was an error '));
     });
   });
@@ -121,10 +125,38 @@ function drawRoute(routeData) {
 }
 
 // Function to print image, info and coords to preview area
-function updateImagePreviewDisplay() {
-  // while(preview.firstChild){
-  //   removechild(preview.firstChild)
-  // }
+function renderImageInfo(file, exifData) {
+  const previewCard = document.createElement('div');
+  const previewCardText = document.createElement('div');
+  const previewImage = document.createElement('img');
+
+  // Convert image date from exif data format to javascript format
+  const [year, month, day, hours, minutes, seconds] =
+    exifData.DateTime.split(/[: ]/);
+  const dateObject = new Date(year, month - 1, day, hours, minutes, seconds);
+
+  previewCard.classList.add('preview__card');
+  previewCardText.classList.add('preview__card--text');
+  previewImage.classList.add('preview__image');
+  previewImage.src = URL.createObjectURL(file);
+  previewCard.appendChild(previewImage);
+  previewCardText.innerHTML = `
+  <h4>${file.name}</h4>
+  <dl>
+    <dd>Date:</dd><dt>${dateObject.toLocaleDateString()}</dt>
+    <dd>Time:</dd><dt>${dateObject.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    })}</dt>
+    <dd>lat, lng: </dd><dt>${exifData.latitude.toFixed(
+      2
+    )}, ${exifData.longitude.toFixed(2)}</dt>
+    <dd>Camera:</dd><dt> ${exifData.Make}, ${exifData.Model}</dt>
+  </dl>
+`;
+
+  previewCard.appendChild(previewCardText);
+  preview.insertAdjacentElement('afterbegin', previewCard);
 }
 
 // Add marker to map for each image added
@@ -137,11 +169,11 @@ input.addEventListener('change', async () => {
   const fileList = input.files;
   if (!fileList.length) return;
   for (const file of fileList) {
-    const imageCoords = await getExifData(file);
-    const { latitude, longitude } = imageCoords;
+    const exifData = await getExifData(file);
+    const { latitude, longitude } = exifData;
     imageCoordsArray.push([latitude, longitude]);
-    renderCoordinates(imageCoords);
-    setPhotoMarker(imageCoords);
+    setPhotoMarker(exifData);
+    renderImageInfo(file, exifData);
   }
 });
 
