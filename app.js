@@ -2,21 +2,24 @@
 
 // DOM elements and variables
 const input = document.querySelector('input[type=file]');
-const submit = document.querySelector('#submit-route-btn');
-
+const submitBtn = document.querySelector('#submit-route-btn');
 const preview = document.querySelector('#preview');
 let latDMS, latRef, latitude, longDMS, longRef, longitude;
 const defaultCoords = [-77.041493, 38.930859];
 const imageCoordsArray = [];
 
 const map = L.map('map').setView([defaultCoords[1], defaultCoords[0]], 13);
-const Stamen_TonerLite = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-  attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  subdomains: 'abcd',
-  minZoom: 0,
-  maxZoom: 20,
-  ext: 'png'
-}).addTo(map);
+const Stamen_TonerLite = L.tileLayer(
+  'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+  {
+    attribution:
+      'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    subdomains: 'abcd',
+    minZoom: 0,
+    maxZoom: 20,
+    ext: 'png',
+  }
+).addTo(map);
 
 // Function to convert degree minute second coordinates to decimal degrees
 function ConvertDMSToDD(degrees, minutes, seconds, direction) {
@@ -142,8 +145,12 @@ function renderImageInfo(file, exifData) {
 }
 
 // Add marker to map for each image added
-function setPhotoMarker({ latitude, longitude }) {
-  L.marker([latitude, longitude]).addTo(map);
+function setPhotoMarker(latitude, longitude, file) {
+  const imageURL = URL.createObjectURL(file);
+  const photoPopup = L.popup({
+    autoClose: false,
+  }).setContent(`<img class='marker-photo' src='${imageURL}' />`);
+  L.marker([latitude, longitude]).addTo(map).bindPopup(photoPopup).openPopup();
 }
 
 // Event handler to run all functions on image and image data
@@ -154,15 +161,16 @@ input.addEventListener('change', async () => {
     const exifData = await getExifData(file);
     const { latitude, longitude } = exifData;
     imageCoordsArray.push([latitude, longitude]);
-    setPhotoMarker(exifData);
+    setPhotoMarker(latitude, longitude, file);
     renderImageInfo(file, exifData);
   }
+  map.flyToBounds(imageCoordsArray);
 });
 
-submit.addEventListener('click', async (e) => {
+submitBtn.addEventListener('click', async (e) => {
   e.preventDefault();
   const routeData = await getRoute(imageCoordsArray);
-  console.log(routeData)
+  console.log(routeData);
   map.flyToBounds(imageCoordsArray);
   drawRoute(routeData);
 });

@@ -170,3 +170,8 @@ button:hover {
   height: 100%;
   z-index: 100;
 }
+
+.marker-photo {
+  max-width: 100%;
+  min-width: 8rem;
+}
