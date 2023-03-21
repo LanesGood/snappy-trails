@@ -7,8 +7,10 @@ const form = document.querySelector('form');
 const clearBtn = document.querySelector('#clear-btn');
 const preview = document.querySelector('#preview');
 const defaultCoords = [-77.041493, 38.930859];
+const uploadedImages = [];
 const imageCoordsArray = [];
 
+// Leaflet objects and initialization
 const map = L.map('map').setView([defaultCoords[1], defaultCoords[0]], 13);
 const Stamen_TonerLite = L.tileLayer(
   'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
@@ -21,6 +23,9 @@ const Stamen_TonerLite = L.tileLayer(
     ext: 'png',
   }
 ).addTo(map);
+const routeLine = L.polyline([]); // Set empty routeline to allow later clearing. Will likely later change to array of features to permit multiple lines
+const photoMarkers = L.layerGroup();
+photoMarkers.addTo(map);
 
 // Function to convert degree minute second coordinates to decimal degrees
 function ConvertDMSToDD(degrees, minutes, seconds, direction) {
@@ -104,7 +109,7 @@ function drawRoute(routeData) {
     coords[1],
     coords[0],
   ]);
-  L.polyline(routeCoords).addTo(map);
+  routeLine.setLatLngs(routeCoords).addTo(map);
 }
 
 // Function to print image, info and coords to preview area
@@ -145,27 +150,53 @@ function renderImageInfo(file, exifData) {
   preview.insertAdjacentElement('afterbegin', previewCard);
 }
 
-// Add marker to map for each image added
+// Add marker with popup to map for each image added
 function setPhotoMarker(latitude, longitude, file) {
   const imageURL = URL.createObjectURL(file);
   const photoPopup = L.popup({
     autoClose: false,
   }).setContent(`<img class='marker-photo' src='${imageURL}' />`);
-  L.marker([latitude, longitude]).addTo(map).bindPopup(photoPopup).openPopup();
+  const photoMarker = L.marker([latitude, longitude]);
+  photoMarkers.addLayer(photoMarker);
+  photoMarker.bindPopup(photoPopup).openPopup();
 }
 
 // Event handler to run all functions on image and image data
 input.addEventListener('change', async () => {
   const fileList = input.files;
   if (!fileList.length) return;
+  submitBtn.disabled = false;
+  // Push all files into array
   for (const file of fileList) {
+    uploadedImages.push(file);
+  }
+  uploadedImages.forEach(async (file, i) => {
     const exifData = await getExifData(file);
     const { latitude, longitude } = exifData;
     imageCoordsArray.push([latitude, longitude]);
-    setPhotoMarker(latitude, longitude, file);
-    renderImageInfo(file, exifData);
+    console.log(imageCoordsArray);
+    setPhotoMarker(latitude, longitude, file, i);
+    renderImageInfo(file, exifData, i);
+    map.flyToBounds(imageCoordsArray);
+  });
+});
+
+clearBtn.addEventListener('click', (e) => {
+  uploadedImages.length = 0;
+  imageCoordsArray.length = 0;
+  // remove all photo markers
+  photoMarkers.clearLayers();
+  // remove route from map
+  routeLine.remove(map);
+
+  // Remove all image previews
+  while (preview.firstChild) {
+    preview.removeChild(preview.firstChild);
   }
-  map.flyToBounds(imageCoordsArray);
+  // reset to default coords/world view
+  form.reset();
+  submitBtn.disabled = true;
+  console.log(uploadedImages);
 });
 
 form.addEventListener('submit', async (e) => {
