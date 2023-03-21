@@ -33,6 +33,11 @@
       <form id="upload-form">
         <label for="fileInput">Select images</label>
         <input type="file" multiple id="fileInput" accept=".jpg, .jpeg, .tiff" multiple />
+        <div class="transport-mode__switcher">
+          <label for="foot"><input type="radio" name="transport-mode" id="foot" value="foot" checked>Hike</label>
+          <label for="bike"><input type="radio" name="transport-mode" id="bike" value="bike">Bike</label>
+          <label for="car"><input type="radio" name="transport-mode" id="car" value="car">Car</label>
+        </div>
         <div id="preview"></div>
         <button type="submit" id="submit-route-btn">Submit</button>        
       </form>

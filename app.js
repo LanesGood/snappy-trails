@@ -3,8 +3,9 @@
 // DOM elements and variables
 const input = document.querySelector('input[type=file]');
 const submitBtn = document.querySelector('#submit-route-btn');
+const form = document.querySelector('form');
+const clearBtn = document.querySelector('#clear-btn');
 const preview = document.querySelector('#preview');
-let latDMS, latRef, latitude, longDMS, longRef, longitude;
 const defaultCoords = [-77.041493, 38.930859];
 const imageCoordsArray = [];
 
@@ -46,13 +47,13 @@ function getExifData(file) {
         Make,
         Model,
       } = EXIF.getAllTags(this);
-      latitude = ConvertDMSToDD(
+      const latitude = ConvertDMSToDD(
         GPSLatitude[0],
         GPSLatitude[1],
         GPSLatitude[2],
         GPSLatitudeRef
       );
-      longitude = ConvertDMSToDD(
+      const longitude = ConvertDMSToDD(
         GPSLongitude[0],
         GPSLongitude[1],
         GPSLongitude[2],
@@ -74,7 +75,7 @@ function getExifData(file) {
 }
 
 // Async function to get routing data from graphhopper. Called after extracting photo EXIF data
-async function getRoute(imageCoordsArray) {
+async function getRoute(imageCoordsArray, transportMode) {
   const pointArray = imageCoordsArray.map(([latitude, longitude]) => [
     +longitude,
     +latitude,
@@ -89,7 +90,7 @@ async function getRoute(imageCoordsArray) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      // profile: 'foot',
+      profile: transportMode,
       points: pointArray,
       points_encoded: false,
     }),
@@ -167,10 +168,12 @@ input.addEventListener('change', async () => {
   map.flyToBounds(imageCoordsArray);
 });
 
-submitBtn.addEventListener('click', async (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const routeData = await getRoute(imageCoordsArray);
-  console.log(routeData);
+  const formData = new FormData(form);
+  const transportMode = formData.get('transport-mode');
+  const routeData = await getRoute(imageCoordsArray, transportMode);
+
   map.flyToBounds(imageCoordsArray);
   drawRoute(routeData);
 });
