@@ -70,6 +70,7 @@ button {
   justify-content: center;
   cursor: pointer;
   transition: transform 0.24s;
+  border: 2px solid transparent;
 }
 
 button:hover {

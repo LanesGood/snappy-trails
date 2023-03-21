@@ -113,7 +113,7 @@ function drawRoute(routeData) {
 }
 
 // Function to print image, info and coords to preview area
-function renderImageInfo(file, exifData) {
+function renderPreviewCard(file, exifData) {
   const previewCard = document.createElement('div');
   previewCard.classList.add('preview__card');
   const previewCardHeader = document.createElement('div');
@@ -147,6 +147,9 @@ function renderImageInfo(file, exifData) {
 `;
 
   previewCard.appendChild(previewCardText);
+  previewCard.addEventListener('click', () =>
+    map.flyTo([exifData.latitude, exifData.longitude], 15)
+  )
   preview.insertAdjacentElement('afterbegin', previewCard);
 }
 
@@ -174,9 +177,9 @@ input.addEventListener('change', async () => {
     const exifData = await getExifData(file);
     const { latitude, longitude } = exifData;
     imageCoordsArray.push([latitude, longitude]);
-    console.log(imageCoordsArray);
+
     setPhotoMarker(latitude, longitude, file, i);
-    renderImageInfo(file, exifData, i);
+    renderPreviewCard(file, exifData, i);
     map.flyToBounds(imageCoordsArray);
   });
 });
@@ -190,13 +193,11 @@ clearBtn.addEventListener('click', (e) => {
   routeLine.remove(map);
 
   // Remove all image previews
-  while (preview.firstChild) {
-    preview.removeChild(preview.firstChild);
-  }
+  preview.replaceChildren();
+
   // reset to default coords/world view
   form.reset();
   submitBtn.disabled = true;
-  console.log(uploadedImages);
 });
 
 form.addEventListener('submit', async (e) => {
