@@ -13,7 +13,7 @@ const uploadedImages = [];
 const imageCoordsArray = [];
 
 // Leaflet objects and initialization
-const map = L.map('map').setView([defaultCoords[1], defaultCoords[0]], 13);
+const map = L.map('map').setView([defaultCoords[1], defaultCoords[0]], 10);
 const Stamen_TonerLite = L.tileLayer(
   'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
   {
@@ -214,7 +214,7 @@ userLocationInput.addEventListener('change', async (e) => {
 
     currentPositionMarker.setLatLng(currentLatLng);
     currentPositionMarker.bindPopup('Current location').openPopup();
-    photoMarkers.addLayer(currentPositionMarker)
+    photoMarkers.addLayer(currentPositionMarker);
     map.flyToBounds(imageCoordsArray);
   } else if (!e.target.checked) {
     if (map.hasLayer(currentPositionMarker)) {
@@ -244,6 +244,7 @@ clearBtn.addEventListener('click', (e) => {
   // reset to default coords/world view
   form.reset();
   submitBtn.disabled = true;
+  map.flyTo([defaultCoords[1], defaultCoords[0]], 10);
 });
 
 form.addEventListener('submit', async (e) => {
