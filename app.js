@@ -113,24 +113,25 @@ function drawRoute(routeData) {
 }
 
 // Function to print image, info and coords to preview area
-function renderPreviewCard(file, exifData) {
+function renderPreviewCard(file, exifData, i) {
   const previewCard = document.createElement('div');
   previewCard.classList.add('preview__card');
+  previewCard.dataset.photoIndex = i;
   const previewCardHeader = document.createElement('div');
   previewCardHeader.classList.add('preview__card--header');
   const previewCardText = document.createElement('div');
   previewCardText.classList.add('preview__card--text');
   const previewImage = document.createElement('img');
   previewImage.classList.add('preview__image');
+  previewImage.src = URL.createObjectURL(file);
+  previewCardHeader.appendChild(previewImage);
+  previewCard.appendChild(previewCardHeader);
 
   // Convert image date from exif data format to javascript format
   const [year, month, day, hours, minutes, seconds] =
     exifData.DateTime.split(/[: ]/);
   const dateObject = new Date(year, month - 1, day, hours, minutes, seconds);
 
-  previewImage.src = URL.createObjectURL(file);
-  previewCardHeader.appendChild(previewImage);
-  previewCard.appendChild(previewCardHeader);
   previewCardText.innerHTML = `
   <h4>${file.name}</h4>
   <dl>
@@ -148,18 +149,27 @@ function renderPreviewCard(file, exifData) {
 
   previewCard.appendChild(previewCardText);
   previewCard.addEventListener('click', () =>
-    map.flyTo([exifData.latitude, exifData.longitude], 15)
-  )
+    previewCardClickHandler(exifData, i)
+  );
   preview.insertAdjacentElement('afterbegin', previewCard);
 }
 
+// Flyto and Open Photo Marker
+function previewCardClickHandler(exifData, i) {
+  map.flyTo([exifData.latitude, exifData.longitude], 15);
+  photoMarkers.eachLayer((layer) => {
+    if (layer.photoIndex === i) layer.openPopup();
+  });
+}
+
 // Add marker with popup to map for each image added
-function setPhotoMarker(latitude, longitude, file) {
+function setPhotoMarker(latitude, longitude, file, i) {
   const imageURL = URL.createObjectURL(file);
   const photoPopup = L.popup({
     autoClose: false,
   }).setContent(`<img class='marker-photo' src='${imageURL}' />`);
   const photoMarker = L.marker([latitude, longitude]);
+  photoMarker.photoIndex = i;
   photoMarkers.addLayer(photoMarker);
   photoMarker.bindPopup(photoPopup).openPopup();
 }
