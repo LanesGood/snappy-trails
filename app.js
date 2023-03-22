@@ -210,21 +210,27 @@ userLocationInput.addEventListener('change', async (e) => {
       coords: { latitude, longitude },
     } = await getPosition();
     currentLatLng = [latitude, longitude];
+    // Add current location from coordinates array
     imageCoordsArray.push(currentLatLng);
-
+    // Add current location marker
     currentPositionMarker.setLatLng(currentLatLng);
-    currentPositionMarker.bindPopup('Current location').openPopup();
+    currentPositionMarker.bindPopup('Current location');
     photoMarkers.addLayer(currentPositionMarker);
+    currentPositionMarker.openPopup();
     map.flyToBounds(imageCoordsArray);
   } else if (!e.target.checked) {
+    // Remove current location marker
     if (map.hasLayer(currentPositionMarker)) {
       map.removeLayer(currentPositionMarker);
     }
-    imageCoordsArray.filter(
-      (latlng) =>
-        latlng[0] !== currentLatLng[0] && latlng[1] !== currentLatLng[1]
+    // Remove current location from coordinates array
+    imageCoordsArray.splice(
+      imageCoordsArray.findIndex(
+        (latlng) =>
+          latlng[0] === currentLatLng[0] && latlng[1] !== currentLatLng[1]
+      ),
+      1
     );
-    // imageCoordsArray.filter((latlng) => latlng !== currentLatLng);
     map.flyToBounds(imageCoordsArray);
     return imageCoordsArray;
   }
