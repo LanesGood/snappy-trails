@@ -6,6 +6,8 @@ const submitBtn = document.querySelector('#submit-route-btn');
 const form = document.querySelector('form');
 const clearBtn = document.querySelector('#clear-btn');
 const preview = document.querySelector('#preview');
+const userLocationInput = document.querySelector('#user-location');
+let currentLatLng = [];
 const defaultCoords = [-77.041493, 38.930859];
 const uploadedImages = [];
 const imageCoordsArray = [];
@@ -25,6 +27,7 @@ const Stamen_TonerLite = L.tileLayer(
 ).addTo(map);
 const routeLine = L.polyline([]); // Set empty routeline to allow later clearing. Will likely later change to array of features to permit multiple lines
 const photoMarkers = L.layerGroup();
+const currentPositionMarker = L.marker();
 photoMarkers.addTo(map);
 
 // Function to convert degree minute second coordinates to decimal degrees
@@ -174,6 +177,12 @@ function setPhotoMarker(latitude, longitude, file, i) {
   photoMarker.bindPopup(photoPopup).openPopup();
 }
 
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
 // Event handler to run all functions on image and image data
 input.addEventListener('change', async () => {
   const fileList = input.files;
@@ -192,6 +201,33 @@ input.addEventListener('change', async () => {
     renderPreviewCard(file, exifData, i);
     map.flyToBounds(imageCoordsArray);
   });
+});
+
+// Locate user when checkbox checked
+userLocationInput.addEventListener('change', async (e) => {
+  if (e.target.checked) {
+    const {
+      coords: { latitude, longitude },
+    } = await getPosition();
+    currentLatLng = [latitude, longitude];
+    imageCoordsArray.push(currentLatLng);
+
+    currentPositionMarker.setLatLng(currentLatLng);
+    currentPositionMarker.bindPopup('Current location').openPopup();
+    photoMarkers.addLayer(currentPositionMarker)
+    map.flyToBounds(imageCoordsArray);
+  } else if (!e.target.checked) {
+    if (map.hasLayer(currentPositionMarker)) {
+      map.removeLayer(currentPositionMarker);
+    }
+    imageCoordsArray.filter(
+      (latlng) =>
+        latlng[0] !== currentLatLng[0] && latlng[1] !== currentLatLng[1]
+    );
+    // imageCoordsArray.filter((latlng) => latlng !== currentLatLng);
+    map.flyToBounds(imageCoordsArray);
+    return imageCoordsArray;
+  }
 });
 
 clearBtn.addEventListener('click', (e) => {

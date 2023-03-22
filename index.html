@@ -32,7 +32,10 @@
       <p>Upload up to 10 images to find your trail</p>
       <form id="upload-form">
         <label for="fileInput">Select images</label>
-        <input type="file" multiple id="fileInput" accept=".jpg, .jpeg, .tiff" multiple />
+        <input type="file" multiple id="fileInput" accept=".jpg, .jpeg, .tiff" />
+
+        <label for="user-location"><input type="checkbox" id="user-location" name="user-location"
+            value="Include my current location" />Include my current location in route</label>
         <div class="transport-mode__switcher">
           <label for="foot"><input type="radio" name="transport-mode" id="foot" value="foot" checked>Hike</label>
           <label for="bike"><input type="radio" name="transport-mode" id="bike" value="bike">Bike</label>
