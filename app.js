@@ -244,7 +244,7 @@ userLocationInput.addEventListener('change', async (e) => {
     const {
       coords: { latitude, longitude },
     } = await getPosition();
-    currentLatLng = [latitude, longitude];
+    currentLatLng.push(latitude, longitude);
     // Add current location from coordinates array
     imageCoordsArray.push(currentLatLng);
     // Add current location marker
@@ -258,13 +258,10 @@ userLocationInput.addEventListener('change', async (e) => {
     if (map.hasLayer(currentPositionMarker)) {
       map.removeLayer(currentPositionMarker);
     }
-    // Remove current location from coordinates array
-    imageCoordsArray.splice(
-      imageCoordsArray.findIndex(
-        (latlng) =>
-          latlng[0] === currentLatLng[0] && latlng[1] !== currentLatLng[1]
-      ),
-      1
+    // Remove current location from coords array
+    imageCoordsArray = imageCoordsArray.filter(
+      (latlng) =>
+        !(latlng[0] === currentLatLng[0] && latlng[1] === currentLatLng[1])
     );
     map.flyToBounds(imageCoordsArray);
     return imageCoordsArray;
