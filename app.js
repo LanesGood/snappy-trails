@@ -93,27 +93,31 @@ function getExifData(file) {
 
 // Async function to get routing data from graphhopper. Called after extracting photo EXIF data
 async function getRoute(imageCoordsArray, transportMode) {
-  const pointArray = imageCoordsArray.map(([latitude, longitude]) => [
-    +longitude,
-    +latitude,
-  ]);
-  const query = new URLSearchParams({
-    key: 'db56c0cf-613e-456d-baea-46650066da62', // remove from github
-  }).toString();
-
-  const resp = await fetch(`https://graphhopper.com/api/1/route?${query}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      profile: transportMode,
-      points: pointArray,
-      points_encoded: false,
-    }),
-  });
-  const data = await resp.json();
-  return data;
+  try {
+    const pointArray = imageCoordsArray.map(([latitude, longitude]) => [
+      +longitude,
+      +latitude,
+    ]);
+    const query = new URLSearchParams({
+      key: 'db56c0cf-613e-456d-baea-46650066da62', // remove from github
+    }).toString();
+    const resp = await fetch(`https://graphhopper.com/api/1/route?${query}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        profile: transportMode,
+        points: pointArray,
+        points_encoded: false,
+      }),
+    });
+    const data = await resp.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    return error;
+  }
 }
 
 function drawRoute(routeData) {
