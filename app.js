@@ -10,7 +10,16 @@ const userLocationInput = document.querySelector('#user-location');
 let currentLatLng = [];
 const defaultCoords = [-77.041493, 38.930859];
 const uploadedImages = [];
-const imageCoordsArray = [];
+let imageCoordsArray = [];
+let routePreviewCard;
+
+// Utility functions
+const toMiles = (meters) => meters * 0.000621371192;
+const toMeters = (miles) => miles * 1609.344;
+function round(number, precision) {
+  return Math.round(number * precision) / precision;
+}
+const miliToTime = (mili) => new Date(mili).toISOString().slice(11, -5); // Currently doesnt work for time > 24 hrs
 
 // Leaflet objects and initialization
 const map = L.map('map').setView([defaultCoords[1], defaultCoords[0]], 10);
@@ -112,7 +121,33 @@ function drawRoute(routeData) {
     coords[1],
     coords[0],
   ]);
+  const routeTime = miliToTime(routeData.paths[0].time);
+  console.log(routeData);
   routeLine.setLatLngs(routeCoords).addTo(map);
+  routeLine.bindPopup(`${routeTime}`).openPopup();
+}
+
+function renderRoutePreview(routeData) {
+  const routeTime = miliToTime(routeData.paths[0].time);
+  const routeDistance = routeData.paths[0].distance;
+  const routePreviewEl = document.getElementsByClassName(
+    'preview__card--route'
+  );
+  if (!routePreviewEl.length) {
+    routePreviewCard = document.createElement('div');
+    routePreviewCard.classList.add(
+      'preview__card--text',
+      'preview__card--route',
+      'preview__card'
+    );
+    preview.insertAdjacentElement('afterbegin', routePreviewCard);
+  }
+  routePreviewCard.innerHTML = `
+  <h4>Route</h4>
+  <span><h4>${routeTime}</h4>
+  <p>${round(toMiles(routeDistance), 100)} mi</p>
+  </span>
+  `;
 }
 
 // Function to print image, info and coords to preview area
@@ -138,15 +173,15 @@ function renderPreviewCard(file, exifData, i) {
   previewCardText.innerHTML = `
   <h4>${file.name}</h4>
   <dl>
-    <dd>Date:</dd><dt>${dateObject.toLocaleDateString()}</dt>
-    <dd>Time:</dd><dt>${dateObject.toLocaleTimeString([], {
+    <dt>Date:</dt><dd>${dateObject.toLocaleDateString()}</dd>
+    <dt>Time:</dt><dd>${dateObject.toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
-    })}</dt>
-    <dd>lat, lng: </dd><dt>${exifData.latitude.toFixed(
+    })}</dd>
+    <dt>lat, lng: </dt><dd>${exifData.latitude.toFixed(
       2
-    )}, ${exifData.longitude.toFixed(2)}</dt>
-    <dd>Camera:</dd><dt> ${exifData.Make} ${exifData.Model}</dt>
+    )}, ${exifData.longitude.toFixed(2)}</dd>
+    <dt>Camera:</dd><dd> ${exifData.Make} ${exifData.Model}</dd>
   </dl>
 `;
 
@@ -261,4 +296,5 @@ form.addEventListener('submit', async (e) => {
 
   map.flyToBounds(imageCoordsArray);
   drawRoute(routeData);
+  renderRoutePreview(routeData);
 });
