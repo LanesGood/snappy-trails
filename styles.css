@@ -87,15 +87,19 @@ button:disabled:hover {
 
 #preview {
   max-width: 100%;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-auto-rows: 8rem;
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 .form-footer {
   display: flex;
   gap: 0.5rem;
-  margin-top: auto;
+  margin: auto -1rem 0;
+  padding: 1rem;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  box-shadow:-2px 0 4px 0 rgba(0, 0, 0, 0.05);
 }
 #submit-route-btn {
   align-items: center;
@@ -115,6 +119,7 @@ button:disabled:hover {
 }
 .preview__card {
   max-width: 100%;
+  max-height: 9rem;
   background: white;
   border-radius: 0.5rem;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px,
@@ -142,7 +147,20 @@ button:disabled:hover {
 .preview__card--text h4 {
   overflow: hidden;
   margin: 0;
+  line-height: 1.75;
   text-overflow: ellipsis;
+}
+.preview__card--route {
+  border-left: 4px solid #1663e0;
+  border-radius: 0;
+  margin: 0 -1rem;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+.preview__card--route:hover {
+  transform: none;
+  cursor: initial;
+  box-shadow: none;
 }
 .preview__card--text dl {
   display: grid;
@@ -152,7 +170,7 @@ button:disabled:hover {
   margin: 0;
   gap: 0.25rem;
 }
-.preview__card--text dd {
+.preview__card--text dt {
   padding: 0;
   margin: 0;
   text-transform: uppercase;
@@ -160,6 +178,10 @@ button:disabled:hover {
   letter-spacing: 0.25px;
   color: #808080;
 }
+.preview__card--text dd {
+  padding: 0;
+  margin: 0;
+} 
 .preview__image {
   max-width: 100%;
 }
