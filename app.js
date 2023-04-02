@@ -229,24 +229,27 @@ input.addEventListener('change', async () => {
   const fileList = input.files;
   if (!fileList.length) return;
   submitBtn.disabled = false;
-  // Push all files into array
-  for (const file of fileList) {
-    uploadedImages.push(file);
-  }
-  uploadedImages.forEach(async (file, i) => {
-    try {
-      const exifData = await getExifData(file);
-      const { latitude, longitude } = exifData;
-      imageCoordsArray.push([latitude, longitude]);
+  Array.from(fileList).forEach(async (file, i) => {
+    if (!uploadedImages.some((f) => f.name === file.name)) {
+      // only add photos if they haven't been added yet
+      uploadedImages.push(file);
+      try {
+        const exifData = await getExifData(file);
+        const { latitude, longitude } = exifData;
+        imageCoordsArray.push([latitude, longitude]);
 
-      setPhotoMarker(latitude, longitude, file, i);
-      renderPreviewCard(file, exifData, i);
-      map.flyToBounds(imageCoordsArray);
-    } catch (e) {
-      console.error(e);
-      alert('Could not extract location data for this image');
+        setPhotoMarker(latitude, longitude, file, i);
+        renderPreviewCard(file, exifData, i);
+        map.flyToBounds(imageCoordsArray);
+      } catch (e) {
+        console.error(e);
+        alert('Could not extract location data for this image');
+      }
+    } else {
+      alert(`${file.name} is already in the destination list`)
     }
   });
+  input.value = null;
 });
 
 // Locate user when checkbox checked
