@@ -245,18 +245,23 @@ input.addEventListener('change', async () => {
 // Locate user when checkbox checked
 userLocationInput.addEventListener('change', async (e) => {
   if (e.target.checked) {
-    const {
-      coords: { latitude, longitude },
-    } = await getPosition();
-    currentLatLng.push(latitude, longitude);
-    // Add current location from coordinates array
-    imageCoordsArray.push(currentLatLng);
-    // Add current location marker
-    currentPositionMarker.setLatLng(currentLatLng);
-    currentPositionMarker.bindPopup('Current location');
-    photoMarkers.addLayer(currentPositionMarker);
-    currentPositionMarker.openPopup();
-    map.flyToBounds(imageCoordsArray);
+    try {
+      const {
+        coords: { latitude, longitude },
+      } = await getPosition();
+      currentLatLng.push(latitude, longitude);
+      // Add current location from coordinates array
+      imageCoordsArray.push(currentLatLng);
+      // Add current location marker
+      currentPositionMarker.setLatLng(currentLatLng);
+      currentPositionMarker.bindPopup('Current location');
+      photoMarkers.addLayer(currentPositionMarker);
+      currentPositionMarker.openPopup();
+      map.flyToBounds(imageCoordsArray);
+    } catch (e) {
+      console.error(e);
+      alert('User location not available'); // Replace with toast
+    }
   } else if (!e.target.checked) {
     // Remove current location marker
     if (map.hasLayer(currentPositionMarker)) {
