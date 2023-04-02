@@ -86,8 +86,8 @@ function getExifData(file) {
         Model,
       };
       resolve(imageData);
-      reject(new Error('There was an error '));
     });
+    reject(new Error('There was an error '));
   });
 }
 
@@ -204,6 +204,8 @@ function previewCardClickHandler(exifData, i) {
   });
 }
 
+// Add preview item for current location
+
 // Add marker with popup to map for each image added
 function setPhotoMarker(latitude, longitude, file, i) {
   const imageURL = URL.createObjectURL(file);
@@ -232,13 +234,18 @@ input.addEventListener('change', async () => {
     uploadedImages.push(file);
   }
   uploadedImages.forEach(async (file, i) => {
-    const exifData = await getExifData(file);
-    const { latitude, longitude } = exifData;
-    imageCoordsArray.push([latitude, longitude]);
+    try {
+      const exifData = await getExifData(file);
+      const { latitude, longitude } = exifData;
+      imageCoordsArray.push([latitude, longitude]);
 
-    setPhotoMarker(latitude, longitude, file, i);
-    renderPreviewCard(file, exifData, i);
-    map.flyToBounds(imageCoordsArray);
+      setPhotoMarker(latitude, longitude, file, i);
+      renderPreviewCard(file, exifData, i);
+      map.flyToBounds(imageCoordsArray);
+    } catch (e) {
+      console.error(e);
+      alert('Could not extract location data for this image');
+    }
   });
 });
 
