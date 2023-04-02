@@ -86,8 +86,8 @@ function getExifData(file) {
         Model,
       };
       resolve(imageData);
+      reject(new Error('There was an error '));
     });
-    reject(new Error('There was an error '));
   });
 }
 
