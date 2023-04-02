@@ -272,7 +272,12 @@ userLocationInput.addEventListener('change', async (e) => {
       (latlng) =>
         !(latlng[0] === currentLatLng[0] && latlng[1] === currentLatLng[1])
     );
-    map.flyToBounds(imageCoordsArray);
+
+    if (imageCoordsArray.length > 0) {
+      map.flyToBounds(imageCoordsArray);
+    } else {
+      map.flyTo([defaultCoords[1], defaultCoords[0]], 10);
+    }
     return imageCoordsArray;
   }
 });
