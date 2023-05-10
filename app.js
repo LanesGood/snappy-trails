@@ -101,7 +101,7 @@ async function getRoute(imageCoordsArray, transportMode) {
     const query = new URLSearchParams({
       key: 'db56c0cf-613e-456d-baea-46650066da62', // remove from github
     }).toString();
-    const resp = await fetch(`https://graphhopper.com/api/1/route?${query}`, {
+    const res = await fetch(`https://graphhopper.com/api/1/route?${query}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -112,7 +112,8 @@ async function getRoute(imageCoordsArray, transportMode) {
         points_encoded: false,
       }),
     });
-    const data = await resp.json();
+    const data = await res.json();
+    if (!res.ok) throw new Error(`${data.message}`);
     return data;
   } catch (error) {
     console.error(error);
@@ -246,7 +247,7 @@ input.addEventListener('change', async () => {
         alert('Could not extract location data for this image');
       }
     } else {
-      alert(`${file.name} is already in the destination list`)
+      alert(`${file.name} is already in the destination list`);
     }
   });
   input.value = null;
