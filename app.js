@@ -9,8 +9,8 @@ const preview = document.querySelector('#preview');
 const userLocationInput = document.querySelector('#user-location');
 let currentLatLng = [];
 const defaultCoords = [-77.041493, 38.930859];
-const uploadedImages = [];
-let imageCoordsArray = [];
+let uploadedImages = [];
+let imageCoords = [];
 let routePreviewCard;
 
 // Utility functions
@@ -92,12 +92,9 @@ function getExifData(file) {
 }
 
 // Async function to get routing data from graphhopper. Called after extracting photo EXIF data
-async function getRoute(imageCoordsArray, transportMode) {
+async function getRoute(imageCoords, transportMode) {
   try {
-    const pointArray = imageCoordsArray.map(([latitude, longitude]) => [
-      +longitude,
-      +latitude,
-    ]);
+    const pointArray = imageCoords.map(({ lat, lng }) => [+lng, +lat]);
     const query = new URLSearchParams({
       key: 'db56c0cf-613e-456d-baea-46650066da62', // remove from github
     }).toString();
@@ -164,11 +161,23 @@ function renderPreviewCard(file, exifData, i) {
   previewCardHeader.classList.add('preview__card--header');
   const previewCardText = document.createElement('div');
   previewCardText.classList.add('preview__card--text');
+
+  // Create remove button
+  const previewCardRemoveBtn = document.createElement('button');
+  previewCardRemoveBtn.innerText = 'X';
+  previewCardRemoveBtn.setAttribute('title', 'Remove this item');
+  previewCardRemoveBtn.classList.add('preview__card--remove-btn');
+
+  // Create card image
   const previewImage = document.createElement('img');
   previewImage.classList.add('preview__image');
   previewImage.src = URL.createObjectURL(file);
+
+  // Append card items
   previewCardHeader.appendChild(previewImage);
   previewCard.appendChild(previewCardHeader);
+  previewCard.appendChild(previewCardRemoveBtn);
+  previewCardRemoveBtn.addEventListener('click', () => removeImageHandler(i));
 
   // Convert image date from exif data format to javascript format
   const [year, month, day, hours, minutes, seconds] =
@@ -205,6 +214,15 @@ function previewCardClickHandler(exifData, i) {
   });
 }
 
+function removeImageHandler(i) {
+  photoMarkers.eachLayer((layer) => {
+    if (layer.photoIndex === i) photoMarkers.removeLayer(layer);
+  });
+  preview.removeChild(preview.querySelector(`[data-photo-index="${i}"]`));
+  uploadedImages = uploadedImages.filter((img) => img.photoIndex !== i);
+  imageCoords = imageCoords.filter((img) => img.photoIndex !== i);
+}
+
 // Add preview item for current location
 
 // Add marker with popup to map for each image added
@@ -233,15 +251,15 @@ input.addEventListener('change', async () => {
   Array.from(fileList).forEach(async (file, i) => {
     if (!uploadedImages.some((f) => f.name === file.name)) {
       // only add photos if they haven't been added yet
-      uploadedImages.push(file);
+      uploadedImages.push({ file, photoIndex: i });
       try {
         const exifData = await getExifData(file);
         const { latitude, longitude } = exifData;
-        imageCoordsArray.push([latitude, longitude]);
+        imageCoords.push({ photoIndex: i, lat: latitude, lng: longitude });
 
         setPhotoMarker(latitude, longitude, file, i);
         renderPreviewCard(file, exifData, i);
-        map.flyToBounds(imageCoordsArray);
+        map.flyToBounds(imageCoords);
       } catch (e) {
         console.error(e);
         alert('Could not extract location data for this image');
@@ -262,13 +280,17 @@ userLocationInput.addEventListener('change', async (e) => {
       } = await getPosition();
       currentLatLng.push(latitude, longitude);
       // Add current location from coordinates array
-      imageCoordsArray.push(currentLatLng);
+      imageCoords.push({
+        photoIndex: 1000,
+        lat: latitude,
+        lng: longitude,
+      });
       // Add current location marker
       currentPositionMarker.setLatLng(currentLatLng);
       currentPositionMarker.bindPopup('Current location');
       photoMarkers.addLayer(currentPositionMarker);
       currentPositionMarker.openPopup();
-      map.flyToBounds(imageCoordsArray);
+      map.flyToBounds(imageCoords);
     } catch (e) {
       console.error(e);
       alert('User location not available'); // Replace with toast
@@ -279,23 +301,23 @@ userLocationInput.addEventListener('change', async (e) => {
       map.removeLayer(currentPositionMarker);
     }
     // Remove current location from coords array
-    imageCoordsArray = imageCoordsArray.filter(
-      (latlng) =>
-        !(latlng[0] === currentLatLng[0] && latlng[1] === currentLatLng[1])
+    imageCoords = imageCoords.filter(
+      (imgCoord) =>
+        !(imgCoord.lat === currentLatLng[0] && imgCoord.lng === currentLatLng[1])
     );
 
-    if (imageCoordsArray.length > 0) {
-      map.flyToBounds(imageCoordsArray);
+    if (imageCoords.length > 0) {
+      map.flyToBounds(imageCoords);
     } else {
       map.flyTo([defaultCoords[1], defaultCoords[0]], 10);
     }
-    return imageCoordsArray;
+    return imageCoords;
   }
 });
 
 clearBtn.addEventListener('click', (e) => {
   uploadedImages.length = 0;
-  imageCoordsArray.length = 0;
+  imageCoords.length = 0;
   // remove all photo markers
   photoMarkers.clearLayers();
   // remove route from map
@@ -314,9 +336,9 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const formData = new FormData(form);
   const transportMode = formData.get('transport-mode');
-  const routeData = await getRoute(imageCoordsArray, transportMode);
+  const routeData = await getRoute(imageCoords, transportMode);
 
-  map.flyToBounds(imageCoordsArray);
+  map.flyToBounds(imageCoords);
   drawRoute(routeData);
   renderRoutePreview(routeData);
 });
