@@ -4,6 +4,7 @@ class PanelView {
   _input = document.querySelector('#fileInput');
   _submitBtn = document.querySelector('#submit-route-btn');
   _clearBtn = document.querySelector('#clear-btn');
+  _userLocationInput = document.querySelector('#user-location');
   preview = document.querySelector('#preview');
   form = document.querySelector('form');
   routePreviewCard;
@@ -42,6 +43,9 @@ class PanelView {
       this.form.reset();
       this._submitBtn.disabled = true;
     });
+  }
+  addHandlerUserLocation(handler) {
+    this._userLocationInput.addEventListener('change', (e) => handler(e));
   }
   // Function to print image, info and coords to preview area
   renderPreviewCard(file, exifData, i) {

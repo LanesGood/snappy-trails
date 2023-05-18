@@ -51,6 +51,48 @@ const controlRemoveImage = function (i) {
   );
 };
 
+const controlUserLocation = async function (e) {
+  if (e.target.checked) {
+    try {
+      const {
+        coords: { latitude, longitude },
+      } = await model.getPosition();
+      model.state.currentLatLng.push(latitude, longitude);
+      // Add current location from coordinates array
+      model.state.imageCoords.push({
+        photoIndex: 1000,
+        lat: latitude,
+        lng: longitude,
+      });
+      // Add current location marker
+      mapView.currentPositionMarker.setLatLng(model.state.currentLatLng);
+      mapView.currentPositionMarker.bindPopup('Current location');
+      mapView.photoMarkers.addLayer(mapView.currentPositionMarker);
+      mapView.currentPositionMarker.openPopup();
+      mapView.map.flyToBounds(model.state.imageCoords);
+    } catch (e) {
+      console.error(e);
+      alert('User location not available'); // Replace with toast
+    }
+  } else if (!e.target.checked) {
+    // Remove current location marker
+    if (mapView.map.hasLayer(mapView.currentPositionMarker)) {
+      mapView.map.removeLayer(mapView.currentPositionMarker);
+    }
+    // Remove current location from coords array
+    model.state.imageCoords = model.state.imageCoords.filter(
+      (imgCoord) =>
+        !(imgCoord.lat === model.state.currentLatLng[0] && imgCoord.lng === model.state.currentLatLng[1])
+    );
+
+    if (model.state.imageCoords.length > 0) {
+      mapView.map.flyToBounds(model.state.imageCoords);
+    } else {
+      mapView.map.flyTo([DEFAULT_COORDS[1], DEFAULT_COORDS[0]], 10);
+    }
+    return model.state.imageCoords;
+  }
+}
 const controlSubmit = async function (transportMode) {
   const routeData = await model.getRoute(transportMode);
   mapView.map.flyToBounds(model.state.imageCoords);
@@ -74,6 +116,7 @@ const init = function () {
   console.log('Snappy trails is up and running. Reticulating splines');
 
   mapView.render();
+  panelView.addHandlerUserLocation(controlUserLocation);
   panelView.addHandlerFileInput(controlAddFiles);
   // panelView.addHandlerRemoveImage(controlRemoveImage);
   panelView.addHandlerSubmit(controlSubmit);

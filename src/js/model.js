@@ -50,7 +50,6 @@ export function getExifData(file) {
 export async function getRoute(transportMode) {
   try {
     const pointArray = state.imageCoords.map(({ lat, lng }) => [+lng, +lat]);
-    console.log(pointArray)
     const query = new URLSearchParams({
       key: 'db56c0cf-613e-456d-baea-46650066da62', // remove from github
     }).toString();
