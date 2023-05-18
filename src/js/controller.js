@@ -9,7 +9,7 @@ if (module.hot) {
 const controlAddFiles = async function (fileList) {
   panelView._submitBtn.disabled = false;
   Array.from(fileList).forEach(async (file, i) => {
-    if (!model.state.uploadedImages.includes((f) => f.name === file.name)) {
+    if (!model.state.uploadedImages.some((img) => img.file.name === file.name)) {
       // only add photos if they haven't been added yet
       model.state.uploadedImages.push({ file, photoIndex: i });
       try {
@@ -33,8 +33,6 @@ const controlAddFiles = async function (fileList) {
       alert(`${file.name} is already in the destination list`);
     }
   });
-  // input.value = null;
-  console.log(model.state);
 };
 // TODO: wire up and fix image removal handler
 const controlRemoveImage = function (i) {
@@ -59,15 +57,19 @@ const controlSubmit = async function (transportMode) {
   mapView.renderRouteLine(routeData);
   panelView.renderRoutePreview(routeData);
 };
+
 const controlClear = function () {
+  // Remove all images
   model.state.uploadedImages.length = 0;
   model.state.imageCoords.length = 0;
   // remove all photo markers
   mapView.photoMarkers.clearLayers();
   // remove route from map
   mapView.routeLine.remove(map);
+  // Reset map view
   mapView.map.flyTo([DEFAULT_COORDS[1], DEFAULT_COORDS[0]], 10);
 };
+
 const init = function () {
   console.log('Snappy trails is up and running. Reticulating splines');
 
