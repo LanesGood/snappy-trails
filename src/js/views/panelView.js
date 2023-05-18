@@ -27,6 +27,14 @@ class PanelView {
       handler(imgIndex);
     });
   }
+  addHandlerPreviewClick(handler) {
+    this.preview.addEventListener('click', function (e) {
+      e.preventDefault();
+      const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
+      if (!imgIndex) return;
+      handler(imgIndex);
+    });
+  }
   addHandlerSubmit(handler) {
     this.form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -95,12 +103,6 @@ class PanelView {
     previewCard.appendChild(previewCardHeader);
     previewCard.appendChild(previewCardRemoveBtn);
     previewCard.appendChild(previewCardText);
-    previewCard.addEventListener('click', () =>
-      // TODO - wire up & fix handler
-      // to explore- potentially can create each preview card in a separate view, and then map() ?
-      // to explore - use .closest() to find data-photoindex of image?
-      previewCardClickHandler(exifData, i)
-    );
     this.preview.insertAdjacentElement('afterbegin', previewCard);
   }
   renderRoutePreview(routeData) {

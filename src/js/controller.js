@@ -36,7 +36,17 @@ const controlAddFiles = async function (fileList) {
     }
   });
 };
-// TODO: wire up and fix image removal handler
+
+const controlPreviewClick = function (i) {
+  const img = model.state.imageCoords.find((img) => img.photoIndex === +i);
+  mapView.map.flyTo([img.lat, img.lng], 15);
+  mapView.photoMarkers.eachLayer((layer) => {
+    if (layer.photoIndex === +i) {
+      layer.openPopup();
+    }
+  });
+};
+
 const controlRemoveImage = function (i) {
   mapView.photoMarkers.eachLayer((layer) => {
     if (layer.photoIndex === +i) {
@@ -124,6 +134,7 @@ const init = function () {
   mapView.render();
   panelView.addHandlerUserLocation(controlUserLocation);
   panelView.addHandlerFileInput(controlAddFiles);
+  panelView.addHandlerPreviewClick(controlPreviewClick);
   panelView.addHandlerRemoveImage(controlRemoveImage);
   panelView.addHandlerSubmit(controlSubmit);
   panelView.addHandlerClear(controlClear);
