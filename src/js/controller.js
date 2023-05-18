@@ -9,7 +9,9 @@ if (module.hot) {
 const controlAddFiles = async function (fileList) {
   panelView._submitBtn.disabled = false;
   Array.from(fileList).forEach(async (file, i) => {
-    if (!model.state.uploadedImages.some((img) => img.file.name === file.name)) {
+    if (
+      !model.state.uploadedImages.some((img) => img.file.name === file.name)
+    ) {
       // only add photos if they haven't been added yet
       model.state.uploadedImages.push({ file, photoIndex: i });
       try {
@@ -36,18 +38,19 @@ const controlAddFiles = async function (fileList) {
 };
 // TODO: wire up and fix image removal handler
 const controlRemoveImage = function (i) {
-  console.log('test');
   mapView.photoMarkers.eachLayer((layer) => {
-    if (layer.photoIndex === i) mapView.photoMarkers.removeLayer(layer);
+    if (layer.photoIndex === +i) {
+      mapView.map.removeLayer(layer);
+    }
   });
   panelView.preview.removeChild(
     panelView.preview.querySelector(`[data-photo-index="${i}"]`)
   );
   model.state.uploadedImages = model.state.uploadedImages.filter(
-    (img) => img.photoIndex !== i
+    (img) => img.photoIndex !== +i
   );
   model.state.imageCoords = model.state.imageCoords.filter(
-    (img) => img.photoIndex !== i
+    (img) => img.photoIndex !== +i
   );
 };
 
@@ -82,7 +85,10 @@ const controlUserLocation = async function (e) {
     // Remove current location from coords array
     model.state.imageCoords = model.state.imageCoords.filter(
       (imgCoord) =>
-        !(imgCoord.lat === model.state.currentLatLng[0] && imgCoord.lng === model.state.currentLatLng[1])
+        !(
+          imgCoord.lat === model.state.currentLatLng[0] &&
+          imgCoord.lng === model.state.currentLatLng[1]
+        )
     );
 
     if (model.state.imageCoords.length > 0) {
@@ -92,7 +98,7 @@ const controlUserLocation = async function (e) {
     }
     return model.state.imageCoords;
   }
-}
+};
 const controlSubmit = async function (transportMode) {
   const routeData = await model.getRoute(transportMode);
   mapView.map.flyToBounds(model.state.imageCoords);
@@ -118,7 +124,7 @@ const init = function () {
   mapView.render();
   panelView.addHandlerUserLocation(controlUserLocation);
   panelView.addHandlerFileInput(controlAddFiles);
-  // panelView.addHandlerRemoveImage(controlRemoveImage);
+  panelView.addHandlerRemoveImage(controlRemoveImage);
   panelView.addHandlerSubmit(controlSubmit);
   panelView.addHandlerClear(controlClear);
 };

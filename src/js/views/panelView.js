@@ -17,8 +17,15 @@ class PanelView {
       this.value = null;
     });
   }
-  addHandlerRemoveImage(handler, i) {
-    handler(i);
+  addHandlerRemoveImage(handler) {
+    this.preview.addEventListener('click', function (e) {
+      e.preventDefault();
+      const removeBtn = e.target.closest('.preview__card--remove-btn');
+      if (!removeBtn) return;
+
+      const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
+      handler(imgIndex);
+    });
   }
   addHandlerSubmit(handler) {
     this.form.addEventListener('submit', async (e) => {
@@ -26,11 +33,6 @@ class PanelView {
       const formData = new FormData(this.form);
       const transportMode = formData.get('transport-mode');
       handler(transportMode);
-      // const routeData = await getRoute(imageCoords, transportMode);
-
-      // map.flyToBounds(imageCoords);
-      // drawRoute(routeData);
-      // renderRoutePreview(routeData);
     });
   }
   addHandlerClear(handler) {
@@ -92,10 +94,6 @@ class PanelView {
     previewCardHeader.appendChild(previewImage);
     previewCard.appendChild(previewCardHeader);
     previewCard.appendChild(previewCardRemoveBtn);
-    previewCardRemoveBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      this.addHandlerRemoveImage();
-    });
     previewCard.appendChild(previewCardText);
     previewCard.addEventListener('click', () =>
       // TODO - wire up & fix handler
