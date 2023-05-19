@@ -4,6 +4,7 @@
   "repository": "https://github.com/LanesGood/snappy-trails.git",
   "author": "LanesGood <Lane@developmentseed.org>",
   "license": "MIT",
+  "source": "src/index.html",
   "scripts": {
     "start": "parcel",
     "predeploy": "rm -rf dist && parcel build src/index.html --public-url /snappy-trails",
