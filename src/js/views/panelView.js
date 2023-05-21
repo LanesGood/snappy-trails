@@ -19,13 +19,12 @@ class PanelView {
   }
   addHandlerRemoveImage(handler) {
     this.preview.addEventListener('click', function (e) {
-      e.preventDefault();
       const removeBtn = e.target.closest('.preview__card--remove-btn');
       if (!removeBtn) return;
-
+      e.stopImmediatePropagation();
       const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
       handler(imgIndex);
-    });
+    }, true);
   }
   addHandlerPreviewClick(handler) {
     this.preview.addEventListener('click', function (e) {
