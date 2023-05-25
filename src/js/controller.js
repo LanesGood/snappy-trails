@@ -35,6 +35,7 @@ const controlAddFiles = async function (fileList) {
       alert(`${file.name} is already in the destination list`);
     }
   });
+  mapView.clearRouteLine();
 };
 
 const controlPreviewClick = function (i) {
@@ -62,6 +63,7 @@ const controlRemoveImage = function (i) {
   model.state.imageCoords = model.state.imageCoords.filter(
     (img) => img.photoIndex !== +i
   );
+  mapView.clearRouteLine();
 };
 
 const controlUserLocation = async function (e) {
