@@ -117,7 +117,7 @@ class PanelView {
         'preview__card--route',
         'preview__card'
       );
-      this.preview.insertAdjacentElement('afterbegin', this.routePreviewCard);
+      this.preview.insertAdjacentElement('beforebegin', this.routePreviewCard);
     }
     this.routePreviewCard.innerHTML = `
     <h4>Route</h4>
