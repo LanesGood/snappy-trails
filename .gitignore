@@ -4,3 +4,4 @@
 /dist
 .prettierrc
 .DS_Store
+.env
