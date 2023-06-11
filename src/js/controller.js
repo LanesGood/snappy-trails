@@ -108,6 +108,7 @@ const controlUserLocation = async function (e) {
     } else {
       mapView.map.flyTo([DEFAULT_COORDS[1], DEFAULT_COORDS[0]], 10);
     }
+    mapView.photoMarkers.removeLayer(mapView.currentPositionMarker);
     return model.state.imageCoords;
   }
 };
