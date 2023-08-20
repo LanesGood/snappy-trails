@@ -66,6 +66,7 @@ class PanelView {
       handler();
       // Remove all image previews
       this.preview.replaceChildren();
+      this.routePreviewCard.remove();
 
       // reset to default coords/world view
       this.form.reset();
