@@ -83,6 +83,9 @@ const controlUserLocation = async function (e) {
       mapView.currentPositionMarker.setLatLng(model.state.currentLatLng);
       mapView.currentPositionMarker.bindPopup('Current location');
       mapView.photoMarkers.addLayer(mapView.currentPositionMarker);
+
+      // Add current location preview card
+      panelView.renderLocationCard(model.state.currentLatLng);
       mapView.currentPositionMarker.openPopup();
       mapView.map.flyToBounds(model.state.imageCoords);
     } catch (e) {
@@ -102,21 +105,53 @@ const controlUserLocation = async function (e) {
           imgCoord.lng === model.state.currentLatLng[1]
         )
     );
+    // Remove current lat long
+    model.state.currentLatLng.length = 0;
 
+    // Set map view based on existing images
     if (model.state.imageCoords.length > 0) {
       mapView.map.flyToBounds(model.state.imageCoords);
     } else {
       mapView.map.flyTo([DEFAULT_COORDS[1], DEFAULT_COORDS[0]], 10);
     }
+    // Remove location preview card
+    panelView.preview.removeChild(panelView.locationPreviewCard);
+    // Remove current position marker
     mapView.photoMarkers.removeLayer(mapView.currentPositionMarker);
     return model.state.imageCoords;
   }
 };
+const controlLocationPreviewClick = function () {
+  mapView.map.flyTo(
+    [model.state.currentLatLng[0], model.state.currentLatLng[1]],
+    15
+  );
+};
+
+const controlRemoveLocationPreview = function () {
+  // Remove current location from coords array
+  model.state.imageCoords = model.state.imageCoords.filter(
+    (imgCoord) =>
+      !(
+        imgCoord.lat === model.state.currentLatLng[0] &&
+        imgCoord.lng === model.state.currentLatLng[1]
+      )
+  );
+  // Remove current lat long
+  model.state.currentLatLng.length = 0;
+  // Remove location preview card
+  panelView.preview.removeChild(panelView.locationPreviewCard);
+  // Remove map marker for current location
+  if (mapView.map.hasLayer(mapView.currentPositionMarker)) {
+    mapView.map.removeLayer(mapView.currentPositionMarker);
+  }
+};
+
 const controlSubmit = async function (transportMode) {
   const routeData = await model.getRoute(transportMode);
   mapView.map.flyToBounds(model.state.imageCoords);
   mapView.renderRouteLine(routeData);
-  panelView.renderRoutePreview(routeData);
+  panelView.renderRoutePreviewCard(routeData);
 };
 
 const controlClear = function () {
@@ -126,7 +161,7 @@ const controlClear = function () {
   // remove all photo markers
   mapView.photoMarkers.clearLayers();
   // remove route from map
-  mapView.routeLine.remove(map);
+  mapView.routeLine.remove();
   // Reset map view
   mapView.map.flyTo([DEFAULT_COORDS[1], DEFAULT_COORDS[0]], 10);
 };
@@ -138,6 +173,8 @@ const init = function () {
   panelView.addHandlerUserLocation(controlUserLocation);
   panelView.addHandlerFileInput(controlAddFiles);
   panelView.addHandlerPreviewClick(controlPreviewClick);
+  panelView.addHandlerLocationPreviewClick(controlLocationPreviewClick);
+  panelView.addHandlerRemoveCurrentLocation(controlRemoveLocationPreview);
   panelView.addHandlerRemoveImage(controlRemoveImage);
   panelView.addHandlerSubmit(controlSubmit);
   panelView.addHandlerClear(controlClear);

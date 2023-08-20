@@ -8,6 +8,7 @@ class PanelView {
   preview = document.querySelector('#preview');
   form = document.querySelector('form');
   routePreviewCard;
+  locationPreviewCard;
 
   addHandlerFileInput(handler) {
     this._input.addEventListener('change', async function (e) {
@@ -32,6 +33,24 @@ class PanelView {
       const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
       if (!imgIndex) return;
       handler(imgIndex);
+    });
+  }
+  addHandlerLocationPreviewClick(handler){
+    this.preview.addEventListener('click', function(e) {
+      e.preventDefault();
+      const locationPreviewCard = e.target.closest('.location__card');
+      if(!locationPreviewCard) return;
+      handler();
+    })
+  }
+  addHandlerRemoveCurrentLocation(handler){
+    this.preview.addEventListener('click', function (e) {
+      const removeBtn = e.target.closest('.location__card--remove-btn');
+      if (!removeBtn) return;
+      e.stopImmediatePropagation();
+      handler();
+      const _userLocationInput = document.querySelector('#user-location');
+      _userLocationInput.checked = false; // Why must this be re-declared rather than using declaration from above?
     });
   }
   addHandlerSubmit(handler) {
@@ -104,7 +123,7 @@ class PanelView {
     previewCard.appendChild(previewCardText);
     this.preview.insertAdjacentElement('afterbegin', previewCard);
   }
-  renderRoutePreview(routeData) {
+  renderRoutePreviewCard(routeData) {
     const routeTime = miliToTime(routeData.paths[0].time);
     const routeDistance = routeData.paths[0].distance;
     const routePreviewEl = document.getElementsByClassName(
@@ -125,6 +144,34 @@ class PanelView {
     <p>${round(toMiles(routeDistance), 100)} mi</p>
     </span>
     `;
+  }
+  renderLocationCard(location) {
+    if (!location) return;
+    const locationCardEl = document.getElementsByClassName('location__card');
+    if (!locationCardEl.length) {
+      this.locationPreviewCard = document.createElement('div');
+      this.locationPreviewCard.classList.add(
+        'preview__card',
+        'preview__card--text',
+        'location__card'
+      );
+
+      this.preview.insertAdjacentElement(
+        'afterbegin',
+        this.locationPreviewCard
+      );
+    }
+    this.locationPreviewCard.innerHTML = `
+      <h4>Current Location</h4>
+      <span><h4>${location}</h4>
+      </span>
+    `;
+    // Create remove button
+    const previewCardRemoveBtn = document.createElement('button');
+    previewCardRemoveBtn.innerText = 'X';
+    previewCardRemoveBtn.setAttribute('title', 'Remove current location');
+    previewCardRemoveBtn.classList.add('location__card--remove-btn');
+    this.locationPreviewCard.appendChild(previewCardRemoveBtn);
   }
 }
 
