@@ -1,10 +1,13 @@
+:root {
+  --field: #574D43;
+  --lake: #0B6683;
+}
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-family: 'Lexend', sans-serif;
-  color: #02122b;
+  font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* color: var(--lake); */
   margin: 0;
   padding: 0;
-  background-image: linear-gradient(135deg, #92ffc0 10%, #002661 100%);
+  background: #F7F6F2;
   height: 100vh;
   max-width: 100vw;
 }
@@ -17,8 +20,9 @@ h6,
 p,
 button,
 input {
+  color: var(--lake);
   margin: 0;
-  font-family: 'Lexend', sans-serif;
+  font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 main {
   z-index: 120;
@@ -33,10 +37,8 @@ main {
 }
 .sidebar {
   padding: 1rem;
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px,
-    rgba(0, 0, 0, 0.05) 0px 5px 10px;
+  background: rgba(255,255,255,0.5);
+  border: 4px solid var(--field);
   overflow: auto;
   display: flex;
   gap: 1rem;
@@ -55,11 +57,8 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #fff;
-  background: linear-gradient(135deg, #002661 0%, #92ffc0 100%);
   padding: 0.75rem 1rem;
   border: 0;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 8px;
-  border-radius: 50px;
   transition: 248ms;
   transform: translateY(0);
   display: inline-flex;
@@ -97,7 +96,6 @@ button:disabled:hover {
   position: sticky;
   bottom: -1rem;
   background: white;
-  box-shadow:-2px -1rem 1rem 0 rgba(0, 0, 0, 0.05);
 }
 #submit-route-btn {
   align-items: center;
@@ -119,15 +117,13 @@ button:disabled:hover {
   max-width: 100%;
   max-height: 9rem;
   background: white;
-  border-radius: 0.5rem;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px,
-    rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
   align-items: flex-start;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 12rem 1fr;
+  grid-template-columns: 8rem 1fr;
   transition: all 0.24s;
-  position: relative
+  position: relative;
+  border: 2px solid var(--field);
 }
 .preview__card:hover {
   cursor: pointer;
@@ -139,7 +135,7 @@ button:disabled:hover {
   position: absolute;
   top: 0.25rem;
   right: 0.25rem;
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: #656565;
   opacity: 0.5;
   background: transparent;
@@ -152,12 +148,31 @@ button:disabled:hover {
   color: #820000;
   border: none;
 }
+/* TODO: Replace below with mixin */
+.location__card--remove-btn {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  font-size: 1rem;
+  color: #656565;
+  opacity: 0.5;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  border: none;
+}
+.location__card--remove-btn:hover {
+  transform: translateY(0);
+  color: #820000;
+  border: none;
+}
 .preview__card--header {
   overflow: hidden;
+  padding: 0.5rem;
 }
 .preview__card--text {
-  font-size: 0.875rem;
-  padding: 1rem;
+  font-size: 0.75rem;
+  padding:  0.75rem;
   overflow: hidden;
 }
 .preview__card--text h4 {
@@ -167,11 +182,10 @@ button:disabled:hover {
   text-overflow: ellipsis;
 }
 .preview__card--route {
-  border-left: 4px solid #1663e0;
+  border-left: 8px solid var(--lake);
   border-radius: 0;
-  margin: 0 -1rem;
+  margin: 0;
   box-shadow: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 .preview__card--route:hover {
   transform: none;
@@ -200,6 +214,8 @@ button:disabled:hover {
 } 
 .preview__image {
   max-width: 100%;
+  max-height: 5rem;
+  border: 2px solid var(--field);
 }
 .preview__image::after {
   box-shadow: inset 3px 3px 10px 0 #000000;
@@ -212,7 +228,13 @@ button:disabled:hover {
 }
 .sidebar h1 {
   margin: 0.5rem 0;
-  font-size: 1.75rem;
+  font-size: 2.25rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  border-top: 1px solid var(--lake);
+  border-bottom: 2px solid var(--lake);
+  padding: 0;
 }
 
 .sidebar label {
@@ -220,17 +242,16 @@ button:disabled:hover {
   display: inline;
 }
 .carto {
-  width: 100%;
-  height: 100%;
-  border-radius: 0.5rem;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px,
-    rgba(0, 0, 0, 0.05) 0px 5px 10px;
+  background: #FAF4E5;
+  padding: 1rem;
+  border: 4px solid var(--field);
   overflow: hidden;
 }
 
 #map {
   height: 100%;
   z-index: 100;
+  border: 1px dashed var(--field);
 }
 
 .leaflet-popup-content-photo {
