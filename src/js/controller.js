@@ -149,9 +149,10 @@ const controlRemoveLocationPreview = function () {
 
 const controlSubmit = async function (transportMode) {
   const routeData = await model.getRoute(transportMode);
+  model.state.routeData = routeData;
   mapView.map.flyToBounds(model.state.imageCoords);
-  mapView.renderRouteLine(routeData);
-  panelView.renderRoutePreviewCard(routeData);
+  mapView.renderRouteLine(model.state.routeData);
+  panelView.renderRoutePreviewCard(model.state.routeData);
 };
 
 const controlClear = function () {

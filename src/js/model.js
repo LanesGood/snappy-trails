@@ -3,6 +3,7 @@ export const state = {
   imageCoords: [],
   uploadedImages: [],
   currentLatLng: [],
+  routeData: {},
 };
 
 // Extract image EXIF data in a promise
