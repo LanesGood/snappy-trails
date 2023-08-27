@@ -35,6 +35,14 @@ class PanelView {
       handler(imgIndex);
     });
   }
+  addHandlerRouteCardClick(handler){
+    document.addEventListener('click', function(e){
+      const routePreviewCard = e.target.closest('.preview__card--route')
+      if(!routePreviewCard) return;
+      console.log(routePreviewCard);
+      handler()
+    })
+  }
   addHandlerLocationPreviewClick(handler){
     this.preview.addEventListener('click', function(e) {
       e.preventDefault();
@@ -104,7 +112,7 @@ class PanelView {
     const dateObject = new Date(year, month - 1, day, hours, minutes, seconds);
 
     previewCardText.innerHTML = `
-      <h4>${file.name}</h4>
+
       <dl>
         <dt>Date:</dt><dd>${dateObject.toLocaleDateString()}</dd>
         <dt>Time:</dt><dd>${dateObject.toLocaleTimeString([], {
@@ -144,6 +152,35 @@ class PanelView {
     <span><h4>${routeTime}</h4>
     <p>${round(toMiles(routeDistance), 100)} mi</p>
     </span>
+    `;
+  }
+  renderRoutePanel(routeData) {
+    console.log(routeData)
+    const routeTime = miliToTime(routeData.paths[0].time);
+    const routeDistance = routeData.paths[0].distance;
+    const routePreviewEl = document.getElementsByClassName(
+      'route-panel'
+    );
+    const routePanel = document.createElement('div');
+    if (!routePreviewEl.length) {
+      routePanel.classList.add(
+        'route-panel',
+      );
+      // this._parentElement.replaceChildren(routePanel);
+      this.preview.classList.add('hidden')
+      this.preview.insertAdjacentElement('beforebegin', routePanel);
+    }
+    routePanel.innerHTML = `
+    <a href="#">Back</a>
+    <h4>Route</h4>
+    <span><h4>${routeTime}</h4></span>
+    <p>${round(toMiles(routeDistance), 100)} mi</p>
+    ${routeData.paths[0].instructions.map((step, index) => {
+      console.log(step)
+      return (`<p>Step ${index + 1}</p>
+      <p>${step.text}</p>
+      `)
+    })}
     `;
   }
   renderLocationCard(location) {

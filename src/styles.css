@@ -4,10 +4,11 @@
 }
 body {
   font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  /* color: var(--lake); */
+  color: var(--lake);
   margin: 0;
   padding: 0;
   background: #F7F6F2;
+  background: #FAF4E5;
   height: 100vh;
   max-width: 100vw;
 }
@@ -56,7 +57,10 @@ button {
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #fff;
+  font-weight: 600;
+  color: var(--lake);
+  background: #fff;
+
   padding: 0.75rem 1rem;
   border: 0;
   transition: 248ms;
@@ -68,11 +72,11 @@ button {
   cursor: pointer;
   transition: transform 0.24s;
   border: 2px solid transparent;
+  border-color: var(--lake);
 }
 
 button:hover {
   transform: translateY(-2px);
-  border: 2px solid white;
 }
 button:disabled {
   background: #a5a5a5;
@@ -101,17 +105,19 @@ button:disabled:hover {
   align-items: center;
   position: sticky;
   bottom: 0;
-  border: 2px solid white;
-  font-size: 1rem;
   padding: 1rem;
   flex: 1;
+  background: var(--lake);
+  color: #fff;
+  border-color: transparent
+}
+#submit-route-btn:disabled {
+  background: #a5a5a5;
 }
 #clear-btn {
   flex: 1;
   margin-top: auto;
   padding: 1rem;
-  color: initial;
-  background: white;
 }
 .preview__card {
   max-width: 100%;
@@ -260,4 +266,7 @@ button:disabled:hover {
 .marker-photo {
   max-width: 100%;
   min-width: 8rem;
+}
+.hidden {
+  display: none;
 }

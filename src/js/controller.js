@@ -48,6 +48,10 @@ const controlPreviewClick = function (i) {
   });
 };
 
+const controlRouteCardClick = function () {
+  panelView.renderRoutePanel(model.state.routeData);
+};
+
 const controlRemoveImage = function (i) {
   mapView.photoMarkers.eachLayer((layer) => {
     if (layer.photoIndex === +i) {
@@ -178,6 +182,7 @@ const init = function () {
   panelView.addHandlerRemoveCurrentLocation(controlRemoveLocationPreview);
   panelView.addHandlerRemoveImage(controlRemoveImage);
   panelView.addHandlerSubmit(controlSubmit);
+  panelView.addHandlerRouteCardClick(controlRouteCardClick);
   panelView.addHandlerClear(controlClear);
 };
 init();
