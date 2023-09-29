@@ -30,16 +30,25 @@
     <section class="sidebar">
       <h1>Snappy Trails</h1>
       <form id="upload-form">
-        <label for="fileInput">Select up to 10 images</label>
         <input type="file" multiple id="fileInput" accept=".jpg, .jpeg, .tiff" />
+        <label for="fileInput">Select up to 10 images</label>
 
         <label for="user-location"><input type="checkbox" id="user-location" name="user-location"
             value="Include my current location" />Include my current location in route</label>
-        <div class="transport-mode__switcher">
-          <label for="foot"><input type="radio" name="transport-mode" id="foot" value="foot" checked>Hike</label>
-          <label for="bike"><input type="radio" name="transport-mode" id="bike" value="bike">Bike</label>
-          <label for="car"><input type="radio" name="transport-mode" id="car" value="car">Car</label>
-        </div>
+        <ul class="transport-mode__switcher">
+          <li>
+            <input type="radio" name="transport-mode" id="foot" value="foot" checked>
+            <label for="foot">Hike</label>
+          </li>
+          <li>
+            <input type="radio" name="transport-mode" id="bike" value="bike">
+            <label for="bike">Bike</label>
+          </li>
+          <li>
+            <input type="radio" name="transport-mode" id="car" value="car">
+            <label for="car">Car</label>
+          </li>
+        </ul>
         <div id="preview"></div>
         <div class="form-footer">
           <button type="reset" id="clear-btn">Clear all</button>
