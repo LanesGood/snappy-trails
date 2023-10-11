@@ -19,13 +19,17 @@ class PanelView {
     });
   }
   addHandlerRemoveImage(handler) {
-    this.preview.addEventListener('click', function (e) {
-      const removeBtn = e.target.closest('.preview__card--remove-btn');
-      if (!removeBtn) return;
-      e.stopImmediatePropagation();
-      const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
-      handler(imgIndex);
-    }, true);
+    this.preview.addEventListener(
+      'click',
+      function (e) {
+        const removeBtn = e.target.closest('.preview__card--remove-btn');
+        if (!removeBtn) return;
+        e.stopImmediatePropagation();
+        const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
+        handler(imgIndex);
+      },
+      true
+    );
   }
   addHandlerPreviewClick(handler) {
     this.preview.addEventListener('click', function (e) {
@@ -35,15 +39,15 @@ class PanelView {
       handler(imgIndex);
     });
   }
-  addHandlerLocationPreviewClick(handler){
-    this.preview.addEventListener('click', function(e) {
+  addHandlerLocationPreviewClick(handler) {
+    this.preview.addEventListener('click', function (e) {
       e.preventDefault();
       const locationPreviewCard = e.target.closest('.location__card');
-      if(!locationPreviewCard) return;
+      if (!locationPreviewCard) return;
       handler();
-    })
+    });
   }
-  addHandlerRemoveCurrentLocation(handler){
+  addHandlerRemoveCurrentLocation(handler) {
     this.preview.addEventListener('click', function (e) {
       const removeBtn = e.target.closest('.location__card--remove-btn');
       if (!removeBtn) return;
@@ -66,7 +70,7 @@ class PanelView {
       handler();
       // Remove all image previews
       this.preview.replaceChildren();
-      this.routePreviewCard.remove();
+      !!this.routePreviewCard && this.routePreviewCard.remove();
 
       // reset to default coords/world view
       this.form.reset();
@@ -77,11 +81,19 @@ class PanelView {
     this._userLocationInput.addEventListener('change', (e) => handler(e));
   }
   // Function to print image, info and coords to preview area
-  renderPreviewCard(file, exifData, i) {
+  renderPreviewCard(img) {
+    const {
+      file,
+      file: { exifdata },
+      latitude,
+      longitude,
+      photoIndex,
+    } = img;
+
     // Create preview card element
     const previewCard = document.createElement('div');
     previewCard.classList.add('preview__card');
-    previewCard.dataset.photoIndex = i;
+    previewCard.dataset.photoIndex = photoIndex;
     const previewCardHeader = document.createElement('div');
     previewCardHeader.classList.add('preview__card--header');
     const previewCardText = document.createElement('div');
@@ -100,21 +112,20 @@ class PanelView {
 
     // Convert image date from exif data format to javascript format
     const [year, month, day, hours, minutes, seconds] =
-      exifData.DateTime.split(/[: ]/);
+      exifdata.DateTime.split(/[: ]/);
     const dateObject = new Date(year, month - 1, day, hours, minutes, seconds);
 
     previewCardText.innerHTML = `
-      <h4>${file.name}</h4>
       <dl>
         <dt>Date:</dt><dd>${dateObject.toLocaleDateString()}</dd>
         <dt>Time:</dt><dd>${dateObject.toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit',
         })}</dd>
-        <dt>lat, lng: </dt><dd>${exifData.latitude.toFixed(
-          2
-        )}, ${exifData.longitude.toFixed(2)}</dd>
-        <dt>Camera:</dd><dd> ${exifData.Make} ${exifData.Model}</dd>
+        <dt>lat, lng: </dt><dd>${latitude.toFixed(2)}, ${longitude.toFixed(
+      2
+    )}</dd>
+        <dt>Camera:</dd><dd> ${exifdata.Make} ${exifdata.Model}</dd>
       </dl>
     `;
     // Append card items
@@ -173,6 +184,10 @@ class PanelView {
     previewCardRemoveBtn.setAttribute('title', 'Remove current location');
     previewCardRemoveBtn.classList.add('location__card--remove-btn');
     this.locationPreviewCard.appendChild(previewCardRemoveBtn);
+  }
+  // Render all cards from state
+  renderAllImgs(state) {
+    state.uploadedImages.map((img) => this.renderPreviewCard(img));
   }
 }
 

@@ -6,6 +6,7 @@ import { DEFAULT_COORDS } from './config.js';
 if (module.hot) {
   module.hot.accept();
 }
+
 const controlAddFiles = async function (fileList) {
   panelView._submitBtn.disabled = false;
   Array.from(fileList).forEach(async (file, i) => {
@@ -17,6 +18,8 @@ const controlAddFiles = async function (fileList) {
       try {
         const exifData = await model.getExifData(file);
         const { latitude, longitude } = exifData;
+        model.state.uploadedImages[i].latitude = latitude;
+        model.state.uploadedImages[i].longitude = longitude;
         model.state.imageCoords.push({
           photoIndex: i,
           lat: latitude,
@@ -25,7 +28,7 @@ const controlAddFiles = async function (fileList) {
 
         // Create a photo marker
         mapView.renderPhotoMarker(latitude, longitude, file, i);
-        panelView.renderPreviewCard(file, exifData, i);
+        panelView.renderPreviewCard(model.state.uploadedImages[i]);
         mapView.map.flyToBounds(model.state.imageCoords);
       } catch (e) {
         console.error(e);
@@ -170,6 +173,7 @@ const controlClear = function () {
 const init = function () {
   console.log('Snappy trails is up and running. Reticulating splines');
 
+  model.state.imageCoords.length > 0 && panelView.renderAllImgs(model.state);
   mapView.render();
   panelView.addHandlerUserLocation(controlUserLocation);
   panelView.addHandlerFileInput(controlAddFiles);
