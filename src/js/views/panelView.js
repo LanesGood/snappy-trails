@@ -1,7 +1,7 @@
 import { miliToTime, round, toMiles } from '../helpers';
 class PanelView {
   _parentElement = document.querySelector('#upload-form');
-  _input = document.querySelector('#fileInput');
+  input = document.querySelector('#fileInput');
   _submitBtn = document.querySelector('#submit-route-btn');
   _clearBtn = document.querySelector('#clear-btn');
   _userLocationInput = document.querySelector('#user-location');
@@ -11,7 +11,7 @@ class PanelView {
   locationPreviewCard;
 
   addHandlerFileInput(handler) {
-    this._input.addEventListener('change', async function (e) {
+    this.input.addEventListener('change', async function (e) {
       const fileList = this.files;
       if (!fileList.length) return;
       handler(fileList);

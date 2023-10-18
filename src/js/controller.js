@@ -48,6 +48,7 @@ const controlAddFiles = async function (fileList) {
   }
 
   mapView.clearRouteLine();
+  panelView.input.value = '';
 };
   
 const controlPreviewClick = function (i) {
