@@ -15,7 +15,6 @@ class PanelView {
       const fileList = this.files;
       if (!fileList.length) return;
       handler(fileList);
-      this.value = null;
     });
   }
   addHandlerRemoveImage(handler) {
@@ -81,15 +80,13 @@ class PanelView {
     this._userLocationInput.addEventListener('change', (e) => handler(e));
   }
   // Function to print image, info and coords to preview area
-  renderPreviewCard(img) {
-    const {
-      file,
-      file: { exifdata },
-      latitude,
-      longitude,
-      photoIndex,
-    } = img;
-
+  renderPreviewCard({
+    file,
+    file: { exifdata },
+    latitude,
+    longitude,
+    photoIndex,
+  }) {
     // Create preview card element
     const previewCard = document.createElement('div');
     previewCard.classList.add('preview__card');

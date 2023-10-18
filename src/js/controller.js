@@ -10,26 +10,33 @@ const { state } = model;
 
 const controlAddFiles = async function (fileList) {
   panelView._submitBtn.disabled = false;
-  Array.from(fileList).forEach(async (file, i) => {
-    if (
-      !state.uploadedImages.some((img) => img.file.name === file.name)
-    ) {
-      // only add photos if they haven't been added yet
-      state.uploadedImages.push({ file, photoIndex: i });
+  let nextPhotoIndex = state.uploadedImages.length; // Initialize with the current count
+  for (let i = 0; i < fileList.length; i++) {
+    const file = fileList[i];
+
+    if (!state.uploadedImages.some((img) => img.file.name === file.name)) {
+      const photoIndex = nextPhotoIndex++;
+
       try {
         const exifData = await model.getExifData(file);
         const { latitude, longitude } = exifData;
-        state.uploadedImages[i].latitude = latitude;
-        state.uploadedImages[i].longitude = longitude;
+
+        const newImage = {
+          file,
+          photoIndex,
+          latitude,
+          longitude,
+        };
+
+        state.uploadedImages.push(newImage);
         state.imageCoords.push({
-          photoIndex: i,
+          photoIndex,
           lat: latitude,
           lng: longitude,
         });
 
-        // Create a photo marker
-        mapView.renderPhotoMarker(latitude, longitude, file, i);
-        panelView.renderPreviewCard(state.uploadedImages[i]);
+        mapView.renderPhotoMarker(latitude, longitude, file, photoIndex);
+        panelView.renderPreviewCard(newImage);
         mapView.map.flyToBounds(state.imageCoords);
       } catch (e) {
         console.error(e);
@@ -38,10 +45,11 @@ const controlAddFiles = async function (fileList) {
     } else {
       alert(`${file.name} is already in the destination list`);
     }
-  });
+  }
+
   mapView.clearRouteLine();
 };
-
+  
 const controlPreviewClick = function (i) {
   const img = state.imageCoords.find((img) => img.photoIndex === +i);
   mapView.map.flyTo([img.lat, img.lng], 15);
@@ -64,9 +72,7 @@ const controlRemoveImage = function (i) {
   state.uploadedImages = state.uploadedImages.filter(
     (img) => img.photoIndex !== +i
   );
-  state.imageCoords = state.imageCoords.filter(
-    (img) => img.photoIndex !== +i
-  );
+  state.imageCoords = state.imageCoords.filter((img) => img.photoIndex !== +i);
   mapView.clearRouteLine();
 };
 
@@ -126,10 +132,7 @@ const controlUserLocation = async function (e) {
   }
 };
 const controlLocationPreviewClick = function () {
-  mapView.map.flyTo(
-    [state.currentLatLng[0], state.currentLatLng[1]],
-    15
-  );
+  mapView.map.flyTo([state.currentLatLng[0], state.currentLatLng[1]], 15);
 };
 
 const controlRemoveLocationPreview = function () {
@@ -166,7 +169,7 @@ const controlClear = function () {
   // remove all photo markers
   mapView.photoMarkers.clearLayers();
   // remove route from map
-  mapView.routeLine.remove();
+  mapView.clearRouteLine();
   // Reset map view
   mapView.map.flyTo([DEFAULT_COORDS[1], DEFAULT_COORDS[0]], 10);
 };
