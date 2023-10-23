@@ -65,8 +65,8 @@ const controlRouteCardClick = function () {
   panelView.renderRoutePanel(model.state.routeData, model.state.transportMode);
 };
 const controlRouteBackClick = function () {
-  console.log('clicked')
-  // panelView.renderForm();
+  panelView.routePanel.remove();
+  panelView.renderAllImgs(state);
 }
 
 const controlRemoveImage = function (i) {

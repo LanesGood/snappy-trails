@@ -205,7 +205,7 @@ class PanelView {
     routePanelBackBtn.classList.add('route-panel--back-btn');
     this.routePanel.insertAdjacentElement('afterbegin', routePanelBackBtn);
 
-    this._parentElement.replaceChildren(this.routePanel);
+    this.preview.replaceChildren(this.routePanel);
   }
   renderLocationCard(location) {
     if (!location) return;
