@@ -11,6 +11,7 @@ body {
   margin: 0;
   padding: 0;
   background: var(--khaki);
+  height: 100%;
   height: 100vh;
   max-width: 100vw;
 }
@@ -31,20 +32,21 @@ main {
   z-index: 120;
   position: relative;
   display: grid;
-  grid-template-columns: 28rem 1fr;
-  gap: 1rem;
-  padding: 1.5rem;
-  height: calc(100% - 3rem);
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 2fr;
+  height: 100%;
   margin: 0;
   overflow: hidden;
 }
 .sidebar {
-  padding: 1rem;
+  padding: 0.5rem;
+  order: 1;
+  border-width: 0px;
+  border-top: 4px solid var(--field);
   background: rgba(255, 255, 255, 0.5);
-  border: 4px solid var(--field);
-  overflow: auto;
+  overflow: hidden;
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   flex-direction: column;
 }
 
@@ -79,7 +81,7 @@ button {
   text-align: center;
   font-weight: 600;
   color: var(--lake);
-  background: #fff; 
+  background: #fff;
   text-transform: uppercase;
   letter-spacing: 0.32px;
   line-height: 120%;
@@ -167,8 +169,8 @@ button:disabled:hover {
 .form-footer {
   display: flex;
   gap: 0.5rem;
-  margin: auto -1rem -1rem;
-  padding: 1rem 1rem;
+  margin: auto -0.5rem -0.5rem;
+  padding: 0.5rem 1rem;
   position: sticky;
   bottom: -1rem;
   background: #f2ede0;
@@ -179,7 +181,7 @@ button:disabled:hover {
   flex: 1;
   background: var(--lake);
   color: #fff;
-  border-color: transparent
+  border-color: transparent;
 }
 #submit-route-btn:disabled {
   background: #a5a5a5;
@@ -333,13 +335,11 @@ button:disabled:hover {
   display: inline;
 }
 .route-panel {
-  background: #fff;;
+  background: #fff;
   border: 2px solid var(--lake);
 }
 .carto {
   background: #faf4e5;
-  padding: 1rem;
-  border: 4px solid var(--field);
   overflow: hidden;
 }
 
@@ -358,4 +358,29 @@ button:disabled:hover {
 }
 .hidden {
   display: none;
+}
+
+
+@media screen and (min-width: 1024px) {
+  main {
+    grid-template-columns: 28rem 1fr;
+    grid-template-rows: 1fr;
+    padding: 1.5rem;
+    gap: 1rem;
+    height: calc(100% - 3rem);
+  }
+  .sidebar {
+    order: 0;
+    padding: 1rem;
+    gap: 1rem;
+    border: 4px solid var(--field);
+  }
+  .carto {
+    padding: 1rem;
+    border: 4px solid var(--field);
+  }
+  .form-footer {
+    margin: auto -1rem -1rem;
+    padding: 1rem;
+  }
 }
