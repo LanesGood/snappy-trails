@@ -332,6 +332,10 @@ button:disabled:hover {
   font-size: 0.875rem;
   display: inline;
 }
+.route-panel {
+  background: #fff;;
+  border: 2px solid var(--lake);
+}
 .carto {
   background: #faf4e5;
   padding: 1rem;

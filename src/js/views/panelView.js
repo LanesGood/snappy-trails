@@ -8,6 +8,7 @@ class PanelView {
   preview = document.querySelector('#preview');
   form = document.querySelector('form');
   routePreviewCard;
+  routePanel;
   locationPreviewCard;
 
   addHandlerFileInput(handler) {
@@ -19,13 +20,17 @@ class PanelView {
     });
   }
   addHandlerRemoveImage(handler) {
-    this.preview.addEventListener('click', function (e) {
-      const removeBtn = e.target.closest('.preview__card--remove-btn');
-      if (!removeBtn) return;
-      e.stopImmediatePropagation();
-      const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
-      handler(imgIndex);
-    }, true);
+    this.preview.addEventListener(
+      'click',
+      function (e) {
+        const removeBtn = e.target.closest('.preview__card--remove-btn');
+        if (!removeBtn) return;
+        e.stopImmediatePropagation();
+        const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
+        handler(imgIndex);
+      },
+      true
+    );
   }
   addHandlerPreviewClick(handler) {
     this.preview.addEventListener('click', function (e) {
@@ -35,23 +40,22 @@ class PanelView {
       handler(imgIndex);
     });
   }
-  addHandlerRouteCardClick(handler){
-    document.addEventListener('click', function(e){
-      const routePreviewCard = e.target.closest('.preview__card--route')
-      if(!routePreviewCard) return;
-      console.log(routePreviewCard);
-      handler()
-    })
+  addHandlerRouteCardClick(handler) {
+    document.addEventListener('click', function (e) {
+      const routePreviewCard = e.target.closest('.preview__card--route');
+      if (!routePreviewCard) return;
+      handler();
+    });
   }
-  addHandlerLocationPreviewClick(handler){
-    this.preview.addEventListener('click', function(e) {
+  addHandlerLocationPreviewClick(handler) {
+    this.preview.addEventListener('click', function (e) {
       e.preventDefault();
       const locationPreviewCard = e.target.closest('.location__card');
-      if(!locationPreviewCard) return;
+      if (!locationPreviewCard) return;
       handler();
-    })
+    });
   }
-  addHandlerRemoveCurrentLocation(handler){
+  addHandlerRemoveCurrentLocation(handler) {
     this.preview.addEventListener('click', function (e) {
       const removeBtn = e.target.closest('.location__card--remove-btn');
       if (!removeBtn) return;
@@ -72,17 +76,17 @@ class PanelView {
   addHandlerClear(handler) {
     this._clearBtn.addEventListener('click', (e) => {
       handler();
-      // Remove all image previews
-      this.preview.replaceChildren();
-      this.routePreviewCard.remove();
-
-      // reset to default coords/world view
-      this.form.reset();
-      this._submitBtn.disabled = true;
     });
   }
   addHandlerUserLocation(handler) {
     this._userLocationInput.addEventListener('change', (e) => handler(e));
+  }
+  addHandlerRoutePanelBack(handler) {
+    document.addEventListener('click', function (e) {
+      const routePanelBackBtn = e.target.closest('.route-panel--back-btn');
+      if (!routePanelBackBtn) return;
+      handler();
+    });
   }
   // Function to print image, info and coords to preview area
   renderPreviewCard(file, exifData, i) {
@@ -154,34 +158,49 @@ class PanelView {
     </span>
     `;
   }
-  renderRoutePanel(routeData) {
-    console.log(routeData)
+  renderRoutePanel(routeData, transportMode) {
     const routeTime = miliToTime(routeData.paths[0].time);
     const routeDistance = routeData.paths[0].distance;
-    const routePreviewEl = document.getElementsByClassName(
-      'route-panel'
-    );
-    const routePanel = document.createElement('div');
+    const routePreviewEl = document.getElementsByClassName('route-panel');
     if (!routePreviewEl.length) {
-      routePanel.classList.add(
-        'route-panel',
-      );
-      // this._parentElement.replaceChildren(routePanel);
-      this.preview.classList.add('hidden')
-      this.preview.insertAdjacentElement('beforebegin', routePanel);
+      this.routePanel = document.createElement('div');
+      this.routePanel.classList.add('route-panel', 'preview__card--text');
     }
-    routePanel.innerHTML = `
-    <a href="#">Back</a>
-    <h4>Route</h4>
-    <span><h4>${routeTime}</h4></span>
-    <p>${round(toMiles(routeDistance), 100)} mi</p>
-    ${routeData.paths[0].instructions.map((step, index) => {
-      console.log(step)
-      return (`<p>Step ${index + 1}</p>
-      <p>${step.text}</p>
-      `)
-    })}
+
+    const startPoint = routeData.paths[0].points.coordinates[0].map((e) =>
+      e.toFixed(2)
+    );
+    const endPoint = routeData.paths[0].points.coordinates
+      .pop()
+      .map((e) => e.toFixed(2));
+    this.routePanel.innerHTML = `
+    <h3>Selected Route</h3>
+    <h4>Traveling by ${transportMode} from ${startPoint} to ${endPoint}</h4>
+    <dl>
+      <dt>${routeTime}</dt>
+      <dd>${round(toMiles(routeDistance), 100)} miles</dd>
+    </dl>
     `;
+
+    const routePanelInstructions = document.createElement('dl');
+    routePanelInstructions.innerHTML = `${routeData.paths[0].instructions
+      .map((step, index) => {
+        return `
+        <dt>${index + 1}</dt>
+        <dd>${step.text}</dd>
+      `;
+      })
+      .join('')}`;
+    this.routePanel.appendChild(routePanelInstructions);
+
+    // Create back button
+    const routePanelBackBtn = document.createElement('button');
+    routePanelBackBtn.innerText = '←';
+    routePanelBackBtn.setAttribute('title', 'Back');
+    routePanelBackBtn.classList.add('route-panel--back-btn');
+    this.routePanel.insertAdjacentElement('afterbegin', routePanelBackBtn);
+
+    this._parentElement.replaceChildren(this.routePanel);
   }
   renderLocationCard(location) {
     if (!location) return;
