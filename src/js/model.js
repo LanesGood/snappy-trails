@@ -3,6 +3,7 @@ export const state = {
   imageCoords: [],
   uploadedImages: [],
   currentLatLng: [],
+  transportMode: '',
   routeData: {},
 };
 

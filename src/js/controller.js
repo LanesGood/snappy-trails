@@ -61,6 +61,14 @@ const controlPreviewClick = function (i) {
   });
 };
 
+const controlRouteCardClick = function () {
+  panelView.renderRoutePanel(model.state.routeData, model.state.transportMode);
+};
+const controlRouteBackClick = function () {
+  panelView.routePanel.remove();
+  panelView.renderAllImgs(state);
+}
+
 const controlRemoveImage = function (i) {
   mapView.photoMarkers.eachLayer((layer) => {
     if (layer.photoIndex === +i) {
@@ -156,7 +164,8 @@ const controlRemoveLocationPreview = function () {
 };
 
 const controlSubmit = async function (transportMode) {
-  const routeData = await model.getRoute(transportMode);
+  state.transportMode = transportMode;
+  const routeData = await model.getRoute(state.transportMode);
   state.routeData = routeData;
   mapView.map.flyToBounds(state.imageCoords);
   mapView.renderRouteLine(state.routeData);
@@ -173,6 +182,14 @@ const controlClear = function () {
   mapView.clearRouteLine();
   // Reset map view
   mapView.map.flyTo([DEFAULT_COORDS[1], DEFAULT_COORDS[0]], 10);
+  // Remove all image previews
+  panelView.preview.replaceChildren();
+  !!panelView.routePreviewCard && panelView.routePreviewCard.remove();
+  panelView.routePanel.remove();
+
+  // reset to default coords/world view
+  panelView.form.reset();
+  panelView._submitBtn.disabled = true;
 };
 
 const init = function () {
@@ -187,6 +204,8 @@ const init = function () {
   panelView.addHandlerRemoveCurrentLocation(controlRemoveLocationPreview);
   panelView.addHandlerRemoveImage(controlRemoveImage);
   panelView.addHandlerSubmit(controlSubmit);
+  panelView.addHandlerRouteCardClick(controlRouteCardClick);
+  panelView.addHandlerRoutePanelBack(controlRouteBackClick);
   panelView.addHandlerClear(controlClear);
 };
 init();
