@@ -1,7 +1,7 @@
 import { miliToTime, round, toMiles } from '../helpers';
 class PanelView {
   _parentElement = document.querySelector('#upload-form');
-  _input = document.querySelector('#fileInput');
+  input = document.querySelector('#fileInput');
   _submitBtn = document.querySelector('#submit-route-btn');
   _clearBtn = document.querySelector('#clear-btn');
   _userLocationInput = document.querySelector('#user-location');
@@ -12,11 +12,10 @@ class PanelView {
   locationPreviewCard;
 
   addHandlerFileInput(handler) {
-    this._input.addEventListener('change', async function (e) {
+    this.input.addEventListener('change', async function (e) {
       const fileList = this.files;
       if (!fileList.length) return;
       handler(fileList);
-      this.value = null;
     });
   }
   addHandlerRemoveImage(handler) {
@@ -89,11 +88,17 @@ class PanelView {
     });
   }
   // Function to print image, info and coords to preview area
-  renderPreviewCard(file, exifData, i) {
+  renderPreviewCard({
+    file,
+    file: { exifdata },
+    latitude,
+    longitude,
+    photoIndex,
+  }) {
     // Create preview card element
     const previewCard = document.createElement('div');
     previewCard.classList.add('preview__card');
-    previewCard.dataset.photoIndex = i;
+    previewCard.dataset.photoIndex = photoIndex;
     const previewCardHeader = document.createElement('div');
     previewCardHeader.classList.add('preview__card--header');
     const previewCardText = document.createElement('div');
@@ -112,7 +117,7 @@ class PanelView {
 
     // Convert image date from exif data format to javascript format
     const [year, month, day, hours, minutes, seconds] =
-      exifData.DateTime.split(/[: ]/);
+      exifdata.DateTime.split(/[: ]/);
     const dateObject = new Date(year, month - 1, day, hours, minutes, seconds);
 
     previewCardText.innerHTML = `
@@ -123,10 +128,10 @@ class PanelView {
           hour: '2-digit',
           minute: '2-digit',
         })}</dd>
-        <dt>lat, lng: </dt><dd>${exifData.latitude.toFixed(
-          2
-        )}, ${exifData.longitude.toFixed(2)}</dd>
-        <dt>Camera:</dd><dd> ${exifData.Make} ${exifData.Model}</dd>
+        <dt>lat, lng: </dt><dd>${latitude.toFixed(2)}, ${longitude.toFixed(
+      2
+    )}</dd>
+        <dt>Camera:</dd><dd> ${exifdata.Make} ${exifdata.Model}</dd>
       </dl>
     `;
     // Append card items
@@ -229,6 +234,10 @@ class PanelView {
     previewCardRemoveBtn.setAttribute('title', 'Remove current location');
     previewCardRemoveBtn.classList.add('location__card--remove-btn');
     this.locationPreviewCard.appendChild(previewCardRemoveBtn);
+  }
+  // Render all cards from state
+  renderAllImgs(state) {
+    state.uploadedImages.map((img) => this.renderPreviewCard(img));
   }
 }
 
