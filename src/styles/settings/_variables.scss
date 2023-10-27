@@ -1,0 +1,91 @@
+/* ==========================================================================
+   Variables
+   ========================================================================== */
+   :root {
+    // Color definitions
+    --khaki: #e5ddc1;
+    --field: #574d43;
+    --lake: #0b6683;
+    --navy: #0b4e83;
+
+    // Color usage
+    --base-color: var(--khaki);
+    --primary-color: var(--lake); 
+    --secondary-color: var(--field);
+
+    // Typography
+    --root-font-size: 14px;
+    
+    --base-font-color: tint(var(--base-color), 8%);
+    --base-font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --base-font-style: normal;
+    --base-font-light: 300;
+    --base-font-regular: 400;
+    --base-font-bold: 700;
+    --base-font-weight: var(--base-font-light);
+    --base-font-size: 1rem;
+    --base-line-height: 1.5;
+
+
+    
+/* Colors
+   ========================================================================== */
+
+   --danger-color: #c0392b;                                 // Pomegranate (red)
+   --success-color: #4CB5AE;                                // Turquoise
+   --warning-color: #f39c12;                                // Orange
+   --info-color: #2980b9;                                   // Belize hole (blue)
+   
+   /* Helper colors */
+   
+   --link-color: var(--primary-color);
+   --base-alpha-color: rgba(var(--base-color), 0.12);
+   
+   
+   /* Typography
+      ========================================================================== */
+   
+   
+   
+   --code-font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+   
+   // $heading-font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+   --heading-font-family: var(--base-font-family);
+   --heading-font-light: 300;
+   --heading-font-regular: 400;
+   --heading-font-bold: 700;
+   --heading-font-weight: var(--heading-font-bold);
+   
+   
+   /* Decoration
+      ========================================================================== */
+   
+   /* Border radius */
+   
+   --base-border-radius: 0;
+   --full-border-radius: 100vh;
+  
+   --base-border-width: 1px;
+   
+   
+   /* Sizing, spacing and media queries
+      ========================================================================== */
+   
+   /* Sizing */
+   
+   --page-header-y: 0;
+   
+   /* Spacing */
+   
+   --global-spacing: 1rem;
+   
+   /* Media queries */
+   
+   --xsmall-range: (0, 543px);
+   --small-range: (544px, 767px);
+   --medium-range: (768px, 991px);
+   --large-range: (992px, 1199px);
+   --xlarge-range: (1200px);
+   
+   $screen: "only screen";
+   }

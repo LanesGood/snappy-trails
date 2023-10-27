@@ -6,11 +6,12 @@
   "license": "MIT",
   "source": "src/index.html",
   "scripts": {
-    "start": "parcel",
+    "start": "parcel --open",
     "predeploy": "rm -rf dist && parcel build src/index.html --public-url /snappy-trails",
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
+    "@parcel/transformer-sass": "2.8.3",
     "gh-pages": "^5.0.0",
     "parcel": "^2.8.3"
   }

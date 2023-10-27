@@ -192,7 +192,7 @@ const controlClear = function () {
   panelView._submitBtn.disabled = true;
 };
 
-const init = function () {
+export const init = function () {
   console.log('Snappy trails is up and running. Reticulating splines');
 
   state.imageCoords.length > 0 && panelView.renderAllImgs(state);
@@ -208,4 +208,3 @@ const init = function () {
   panelView.addHandlerRoutePanelBack(controlRouteBackClick);
   panelView.addHandlerClear(controlClear);
 };
-init();

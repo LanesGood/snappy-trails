@@ -49,7 +49,7 @@ class PanelView {
   addHandlerLocationPreviewClick(handler) {
     this.preview.addEventListener('click', function (e) {
       e.preventDefault();
-      const locationPreviewCard = e.target.closest('.location__card');
+      const locationPreviewCard = e.target.closest('.preview__card--location');
       if (!locationPreviewCard) return;
       handler();
     });
@@ -209,13 +209,13 @@ class PanelView {
   }
   renderLocationCard(location) {
     if (!location) return;
-    const locationCardEl = document.getElementsByClassName('location__card');
+    const locationCardEl = document.getElementsByClassName('preview__card--location');
     if (!locationCardEl.length) {
       this.locationPreviewCard = document.createElement('div');
       this.locationPreviewCard.classList.add(
         'preview__card',
-        'preview__card--text',
-        'location__card'
+        'preview__card--location',
+        'preview__card--text'
       );
 
       this.preview.insertAdjacentElement(
@@ -224,8 +224,8 @@ class PanelView {
       );
     }
     this.locationPreviewCard.innerHTML = `
-      <h4>Current Location</h4>
-      <span><h4>${location}</h4>
+      <h4>Current Location: </h4>
+      <span><h4>${location[0].toFixed(2)},${location[1].toFixed(2)}</h4>
       </span>
     `;
     // Create remove button
