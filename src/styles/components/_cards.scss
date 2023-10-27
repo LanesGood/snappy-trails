@@ -19,7 +19,6 @@
     background: white;
     color: var(--lake);
     cursor: pointer;
-    transform: translateY(-1px);
     border-color: var(--lake);
     border-left-width: 8px;
   }
@@ -27,8 +26,9 @@
 .preview__card--remove-btn,
 .location__card--remove-btn {
   position: absolute;
-  top: 0.25rem;
+  top: 0.125rem;
   right: 0.25rem;
+  text-transform: lowercase;
   font-size: 1rem;
   color: #656565;
   opacity: 0.5;
