@@ -106,7 +106,7 @@ class PanelView {
 
     // Create remove button
     const previewCardRemoveBtn = document.createElement('button');
-    previewCardRemoveBtn.innerText = 'X';
+    previewCardRemoveBtn.innerText = 'x';
     previewCardRemoveBtn.setAttribute('title', 'Remove this item');
     previewCardRemoveBtn.classList.add('preview__card--remove-btn');
 
@@ -230,7 +230,7 @@ class PanelView {
     `;
     // Create remove button
     const previewCardRemoveBtn = document.createElement('button');
-    previewCardRemoveBtn.innerText = 'X';
+    previewCardRemoveBtn.innerText = 'x';
     previewCardRemoveBtn.setAttribute('title', 'Remove current location');
     previewCardRemoveBtn.classList.add('location__card--remove-btn');
     this.locationPreviewCard.appendChild(previewCardRemoveBtn);
