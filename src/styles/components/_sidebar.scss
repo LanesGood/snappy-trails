@@ -1,0 +1,81 @@
+// Sidebar
+
+.sidebar {
+  padding: 0.5rem;
+  order: 1;
+  border-width: 0px;
+  border-top: 4px solid var(--field);
+  background: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+  & * {
+    flex-shrink: 0;
+  }
+  & .heading--brand {
+    margin: 0.5rem 0;
+    font-size: 2.25rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    border-top: 1px solid var(--lake);
+    border-bottom: 2px solid var(--lake);
+    padding: 0;
+  }
+}
+.preview--list {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  height: calc(100% - 20rem);
+  overflow: scroll;
+}
+
+#upload-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.route-panel {
+  background: #fff;
+  border: 2px solid var(--lake);
+  width: 100%;
+}
+
+// Form Footer
+.form-footer {
+  display: flex;
+  gap: 0.5rem;
+  margin: auto -0.5rem -0.5rem;
+  padding: 0.5rem;
+  position: sticky;
+  bottom: 0;
+  background: #f2ede0;
+}
+
+.form-footer button {
+  font-size: 1rem;
+  flex: 1;
+  background: var(--lake);
+  color: #ffffff;
+  border-color: transparent;
+}
+@media screen and (min-width: 1024px) {
+  .sidebar {
+    order: 0;
+    padding: 1rem;
+    gap: 1rem;
+    border: 4px solid var(--field);
+  }
+  .form-footer {
+    margin: auto -1rem -1rem;
+    padding: 1rem;
+    bottom: -1rem;
+  }
+}

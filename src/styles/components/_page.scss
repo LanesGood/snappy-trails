@@ -1,0 +1,32 @@
+main {
+  z-index: 120;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 2fr;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+.carto {
+  background: #faf4e5;
+  overflow: hidden;
+}
+
+#map {
+  height: 100%;
+  z-index: 100;
+  border: 1px dashed var(--field);
+}
+@media screen and (min-width: 1024px) {
+  main {
+    grid-template-columns: 28rem 1fr;
+    grid-template-rows: 1fr;
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+  .carto {
+    padding: 1rem;
+    border: 4px solid var(--field);
+  }
+}

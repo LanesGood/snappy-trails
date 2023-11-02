@@ -1,0 +1,114 @@
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+.preview__card {
+  max-width: 100%;
+  max-height: 9rem;
+  background: white;
+  align-items: stretch;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  grid-template-rows: minmax(5px, 7.75rem);
+  transition: all 0.24s;
+  position: relative;
+  border: 2px solid var(--field);
+  flex-shrink: 0;
+
+  &:hover {
+    background: white;
+    color: var(--lake);
+    cursor: pointer;
+    border-color: var(--lake);
+    border-left-width: 8px;
+  }
+}
+.preview__card--remove-btn,
+.location__card--remove-btn {
+  position: absolute;
+  top: 0.125rem;
+  right: 0.25rem;
+  text-transform: lowercase;
+  font-size: 1rem;
+  color: #656565;
+  opacity: 0.5;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  border: none;
+  &:hover {
+    transform: translateY(0);
+    background: none;
+    color: #820000;
+    border: none;
+  }
+}
+.preview__card--header {
+  padding: 0.5rem;
+  display: flex;
+  overflow: hidden;
+  justify-content: center;
+}
+.preview__image {
+  border: 2px solid var(--field);
+  max-width: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  max-height: 100%;
+  overflow: hidden;
+  flex: 1;
+}
+.preview__card--location,
+.preview__card--route {
+  grid-template-rows: max-content;
+  align-self: stretch !important;
+}
+.preview__card--route {
+  border-left: 8px solid var(--lake);
+  border-radius: 0;
+  margin: 0;
+  box-shadow: none;
+  &:hover {
+    transform: none;
+    box-shadow: none;
+    background-color: var(--lake);
+  }
+}
+.preview__card--route:hover.preview__card--text dl,
+.preview__card--route:hover.preview__card--text dt,
+.preview__card--route:hover.preview__card--text h4 {
+  color: white;
+}
+.preview__card--text {
+  font-size: 0.875rem;
+  padding: 0.75rem 0.5rem;
+  overflow: hidden;
+  align-self: center;
+  & h4 {
+    overflow: hidden;
+    margin: 0;
+    line-height: 1.75;
+    text-overflow: ellipsis;
+  }
+  & dl {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    align-items: baseline;
+    padding: 0;
+    margin: 0;
+    gap: 0.5rem 0.25rem;
+  }
+  & dt {
+    padding: 0;
+    margin: 0;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.25px;
+    color: #808080;
+  }
+  & dd {
+    padding: 0;
+    margin: 0;
+  }
+}

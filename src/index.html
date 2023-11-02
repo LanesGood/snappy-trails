@@ -7,7 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Styles - normalize and external css for now -->
-  <link rel="stylesheet" type="text/css" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
@@ -20,7 +19,7 @@
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
     integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet-providers@1.13.0/leaflet-providers.min.js"></script>
-  <script type="module" src="js/controller.js"></script>
+  <script type="module" src="js/index.js"></script>
 
   <title>Snappy Trails</title>
 </head>
@@ -28,28 +27,28 @@
 <body>
   <main>
     <section class="sidebar">
-      <h1>Snappy Trails</h1>
+      <h1 class="heading--brand">Snappy Trails</h1>
       <form id="upload-form">
         <input type="file" multiple id="fileInput" accept=".jpg, .jpeg, .tiff" />
         <label for="fileInput">Select up to 10 images</label>
 
-        <label for="user-location"><input type="checkbox" id="user-location" name="user-location"
+        <label for="user-location" class="form__control"><input type="checkbox" id="user-location" name="user-location"
             value="Include my current location" />Include my current location in route</label>
-        <ul class="transport-mode__switcher">
-          <li>
+        <ul class="radio-button--group">
+          <li class="radio-button">
             <input type="radio" name="transport-mode" id="foot" value="foot" checked>
             <label for="foot">Hike</label>
           </li>
-          <li>
+          <li class="radio-button">
             <input type="radio" name="transport-mode" id="bike" value="bike">
             <label for="bike">Bike</label>
           </li>
-          <li>
+          <li class="radio-button">
             <input type="radio" name="transport-mode" id="car" value="car">
             <label for="car">Car</label>
           </li>
         </ul>
-        <div id="preview"></div>
+        <div id="preview" class="preview--list"></div>
         <div class="form-footer">
           <button type="reset" id="clear-btn">Clear all</button>
           <button disabled type="submit" id="submit-route-btn">Submit</button>

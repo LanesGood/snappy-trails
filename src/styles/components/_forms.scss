@@ -1,0 +1,28 @@
+.form__control {
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: 1rem auto;
+  align-items: center;
+}
+
+label,
+input[type="file"],
+input[type="file"]::file-selector-button {
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.32px;
+  font-size: 0.875rem;
+}
+input[type="file"] {
+  border: 2px solid var(--lake);
+  background-color: white;
+}
+input[type="file"]::file-selector-button {
+  color: white;
+  border: none;
+  outline: none;
+  background-color: var(--lake);
+  padding: 0.5rem;
+  line-height: 1;
+  font-family: var(--base-font);
+}

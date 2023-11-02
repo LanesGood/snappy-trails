@@ -1,0 +1,27 @@
+/* ==========================================================================
+   Leaflet
+   ========================================================================== */
+.leaflet-popup-content-photo {
+  margin: 0.5rem;
+}
+.marker-photo {
+  max-width: 100%;
+  min-width: 8rem;
+}
+.leaflet-popup-content:has(.marker-photo) {
+  margin: 1rem;
+  border: 2px solid var(--field);
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  box-shadow: none;
+  border-radius: 0;
+  border: 1px solid var(--field);
+}
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--field);
+  width: 1rem;
+  height: 1rem;
+  top: -2px;
+  right: 2px;
+}
