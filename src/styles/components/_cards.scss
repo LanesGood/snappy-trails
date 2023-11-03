@@ -23,6 +23,11 @@
     border-left-width: 8px;
   }
 }
+.preview__card header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
 .preview__card--remove-btn,
 .location__card--remove-btn {
   position: absolute;

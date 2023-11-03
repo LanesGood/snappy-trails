@@ -174,19 +174,28 @@ class PanelView {
 
     const startPoint = routeData.paths[0].points.coordinates[0].map((e) =>
       e.toFixed(2)
-    );
+    ).join(', ');
     const endPoint = routeData.paths[0].points.coordinates
       .pop()
-      .map((e) => e.toFixed(2));
+      .map((e) => e.toFixed(2)).join(', ');
     this.routePanel.innerHTML = `
-    <h3>Selected Route</h3>
-    <h4>Traveling by ${transportMode} from ${startPoint} to ${endPoint}</h4>
-    <dl>
-      <dt>${routeTime}</dt>
-      <dd>${round(toMiles(routeDistance), 100)} miles</dd>
-    </dl>
+    <h3>${transportMode} Route</h3>
+    <p>From <strong>${startPoint}</strong></p>
+    <p>To <strong>${endPoint}</strong></p>
+    <h2>
+    ${routeTime} <span>(${round(toMiles(routeDistance), 100)} miles)</span>
+    </h2>
     `;
 
+    // Create back button
+    const routePanelBackBtn = document.createElement('button');
+    routePanelBackBtn.innerText = '← Back';
+    routePanelBackBtn.setAttribute('title', 'Back');
+    routePanelBackBtn.classList.add('route-panel--back-btn', 'btn--small');
+    this.routePanel.appendChild(routePanelBackBtn);
+
+    this.preview.replaceChildren(this.routePanel);
+    // Add route instructions
     const routePanelInstructions = document.createElement('dl');
     routePanelInstructions.innerHTML = `${routeData.paths[0].instructions
       .map((step, index) => {
@@ -197,15 +206,6 @@ class PanelView {
       })
       .join('')}`;
     this.routePanel.appendChild(routePanelInstructions);
-
-    // Create back button
-    const routePanelBackBtn = document.createElement('button');
-    routePanelBackBtn.innerText = '←';
-    routePanelBackBtn.setAttribute('title', 'Back');
-    routePanelBackBtn.classList.add('route-panel--back-btn');
-    this.routePanel.insertAdjacentElement('afterbegin', routePanelBackBtn);
-
-    this.preview.replaceChildren(this.routePanel);
   }
   renderLocationCard(location) {
     if (!location) return;
@@ -224,9 +224,9 @@ class PanelView {
       );
     }
     this.locationPreviewCard.innerHTML = `
-      <h4>Current Location: </h4>
-      <span><h4>${location[0].toFixed(2)},${location[1].toFixed(2)}</h4>
-      </span>
+      <header><h4>Current Location:${' '}</h4>
+      <span><p>${location[0].toFixed(2)},${location[1].toFixed(2)}</p>
+      </span></header>
     `;
     // Create remove button
     const previewCardRemoveBtn = document.createElement('button');

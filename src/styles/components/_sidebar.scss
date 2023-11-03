@@ -14,11 +14,14 @@
     flex-shrink: 0;
   }
   & .heading--brand {
-    margin: 0.5rem 0;
-    font-size: 2.25rem;
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     text-align: center;
+    text-shadow: -2px 3px var(--navy);
+    -webkit-text-stroke: 1px var(--khaki);
     border-top: 1px solid var(--lake);
     border-bottom: 2px solid var(--lake);
     padding: 0;

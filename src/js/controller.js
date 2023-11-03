@@ -62,11 +62,12 @@ const controlPreviewClick = function (i) {
 };
 
 const controlRouteCardClick = function () {
-  panelView.renderRoutePanel(model.state.routeData, model.state.transportMode);
+  panelView.renderRoutePanel(state.routeData, state.transportMode);
 };
 const controlRouteBackClick = function () {
   panelView.routePanel.remove();
   panelView.renderAllImgs(state);
+  (state.currentLatLng && panelView.renderLocationCard(state.currentLatLng))
 }
 
 const controlRemoveImage = function (i) {
@@ -168,7 +169,7 @@ const controlSubmit = async function (transportMode) {
   const routeData = await model.getRoute(state.transportMode);
   state.routeData = routeData;
   mapView.map.flyToBounds(state.imageCoords);
-  mapView.renderRouteLine(state.routeData);
+  mapView.renderRouteLine(state.routeData, state.transportMode);
   panelView.renderRoutePreviewCard(state.routeData);
 };
 

@@ -1,8 +1,10 @@
 /* ==========================================================================
    Leaflet
    ========================================================================== */
-.leaflet-popup-content-photo {
-  margin: 0.5rem;
+.leaflet-popup-content {
+ font-family: var(--base-font-family);
+ color: var(--base-font-color);
+ font-weight: bold;
 }
 .marker-photo {
   max-width: 100%;

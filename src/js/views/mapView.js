@@ -31,14 +31,14 @@ class MapView {
     photoMarker.bindPopup(photoPopup).openPopup();
   }
 
-  renderRouteLine(routeData) {
+  renderRouteLine(routeData, transportMode) {
     const routeCoords = routeData.paths[0].points.coordinates.map((coords) => [
       coords[1],
       coords[0],
     ]);
     const routeTime = miliToTime(routeData.paths[0].time);
     this.routeLine.setLatLngs(routeCoords).addTo(this.map);
-    this.routeLine.bindPopup(`${routeTime}`).openPopup();
+    this.routeLine.bindPopup(`${transportMode}: ${routeTime}`).openPopup();
   }
   clearRouteLine(){
     this.routeLine = L.polyline([]);
