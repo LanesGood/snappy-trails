@@ -200,6 +200,7 @@ export const init = function () {
   mapView.render();
   panelView.addHandlerUserLocation(controlUserLocation);
   panelView.addHandlerFileInput(controlAddFiles);
+  panelView.addHandlerDragNDrop(controlAddFiles);
   panelView.addHandlerPreviewClick(controlPreviewClick);
   panelView.addHandlerLocationPreviewClick(controlLocationPreviewClick);
   panelView.addHandlerRemoveCurrentLocation(controlRemoveLocationPreview);

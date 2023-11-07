@@ -7,6 +7,7 @@ class PanelView {
   _userLocationInput = document.querySelector('#user-location');
   preview = document.querySelector('#preview');
   form = document.querySelector('form');
+  dropZone = document.querySelector('#drop_zone');
   routePreviewCard;
   routePanel;
   locationPreviewCard;
@@ -17,6 +18,47 @@ class PanelView {
       if (!fileList.length) return;
       handler(fileList);
     });
+  }
+  // Drag and drop functions for file upload
+  addHandlerDragNDrop(handler) {
+    console.log('dnd fired');
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
+      this.dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+    ['dragenter', 'dragover'].forEach((eventName) => {
+      this.dropZone.addEventListener(eventName, highlight, false);
+    });
+    ['dragleave', 'drop'].forEach((eventName) => {
+      this.dropZone.addEventListener(eventName, unhighlight, false);
+    });
+    this.dropZone.addEventListener(
+      'drop',
+      async function (e) {
+        console.log(e)
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        if (!files.length) return;
+        handler(files);
+      },
+      false
+    );
+
+    const helperText = document.querySelector('#drop_zone small');
+
+    function highlight(e) {
+      this.classList.add('highlight');
+      helperText.innerText = 'Drop images to upload';
+    }
+
+    function unhighlight(e) {
+      this.classList.remove('highlight');
+      helperText.innerText = 'Upload up to 10 images';
+    }
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }
   addHandlerRemoveImage(handler) {
     this.preview.addEventListener(
@@ -98,6 +140,7 @@ class PanelView {
     // Create preview card element
     const previewCard = document.createElement('div');
     previewCard.classList.add('preview__card');
+    previewCard.setAttribute('draggable', 'true');
     previewCard.dataset.photoIndex = photoIndex;
     const previewCardHeader = document.createElement('div');
     previewCardHeader.classList.add('preview__card--header');
@@ -172,12 +215,13 @@ class PanelView {
       this.routePanel.classList.add('route-panel', 'preview__card--text');
     }
 
-    const startPoint = routeData.paths[0].points.coordinates[0].map((e) =>
-      e.toFixed(2)
-    ).join(', ');
+    const startPoint = routeData.paths[0].points.coordinates[0]
+      .map((e) => e.toFixed(2))
+      .join(', ');
     const endPoint = routeData.paths[0].points.coordinates
       .pop()
-      .map((e) => e.toFixed(2)).join(', ');
+      .map((e) => e.toFixed(2))
+      .join(', ');
     this.routePanel.innerHTML = `
     <h3>${transportMode} Route</h3>
     <p>From <strong>${startPoint}</strong></p>
@@ -209,7 +253,9 @@ class PanelView {
   }
   renderLocationCard(location) {
     if (!location) return;
-    const locationCardEl = document.getElementsByClassName('preview__card--location');
+    const locationCardEl = document.getElementsByClassName(
+      'preview__card--location'
+    );
     if (!locationCardEl.length) {
       this.locationPreviewCard = document.createElement('div');
       this.locationPreviewCard.classList.add(
@@ -217,6 +263,7 @@ class PanelView {
         'preview__card--location',
         'preview__card--text'
       );
+      this.locationPreviewCard.setAttribute('draggable', 'true');
 
       this.preview.insertAdjacentElement(
         'afterbegin',
