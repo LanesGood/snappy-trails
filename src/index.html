@@ -29,8 +29,11 @@
     <section class="sidebar">
       <h1 class="heading--brand">Snappy Trails</h1>
       <form id="upload-form">
-        <input type="file" multiple id="fileInput" accept=".jpg, .jpeg, .tiff" />
-        <label for="fileInput">Select up to 10 images</label>
+        <div id="drop_zone" class="test">
+          <input type="file" multiple id="fileInput" accept=".jpg, .jpeg, .png, .gif" />
+          <label for="fileInput" class="button btn--small">Select Images</label>
+          <small>Upload up to 10 images</small>
+        </div>
 
         <label for="user-location" class="form__control"><input type="checkbox" id="user-location" name="user-location"
             value="Include my current location" />Include my current location in route</label>

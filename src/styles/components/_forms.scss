@@ -5,24 +5,30 @@
   align-items: center;
 }
 
-label,
-input[type="file"],
-input[type="file"]::file-selector-button {
+#upload-form label, #upload-form small{
   text-transform: uppercase;
   font-weight: bold;
   letter-spacing: 0.32px;
   font-size: 0.875rem;
 }
-input[type="file"] {
-  border: 2px solid var(--lake);
-  background-color: white;
+#fileInput {
+  display: none;
 }
-input[type="file"]::file-selector-button {
-  color: white;
-  border: none;
-  outline: none;
-  background-color: var(--lake);
-  padding: 0.5rem;
-  line-height: 1;
-  font-family: var(--base-font);
+
+#drop_zone {
+  border: 2px dashed var(--lake);
+  height: 100px;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+#drop_zone.highlight {
+  border: 2px solid var(--lake);
+  background: rgba(#0b6683, 0.25);
+  input#fileInput {
+    background-color: var(--lake);
+    color: white;
+  }
 }
