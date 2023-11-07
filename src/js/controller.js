@@ -67,7 +67,7 @@ const controlRouteCardClick = function () {
 const controlRouteBackClick = function () {
   panelView.routePanel.remove();
   panelView.renderAllImgs(state);
-  (state.currentLatLng && panelView.renderLocationCard(state.currentLatLng))
+  (state.currentLatLng.length > 0 && panelView.renderLocationCard(state.currentLatLng))
 }
 
 const controlRemoveImage = function (i) {
