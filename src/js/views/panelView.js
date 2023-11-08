@@ -5,7 +5,7 @@ class PanelView {
   _submitBtn = document.querySelector('#submit-route-btn');
   _clearBtn = document.querySelector('#clear-btn');
   _userLocationInput = document.querySelector('#user-location');
-  preview = document.querySelector('#preview');
+  imageList = document.querySelector('#image_list');
   form = document.querySelector('form');
   dropZone = document.querySelector('#drop_zone');
   routePreviewCard;
@@ -20,8 +20,7 @@ class PanelView {
     });
   }
   // Drag and drop functions for file upload
-  addHandlerDragNDrop(handler) {
-    console.log('dnd fired');
+  addHandlerDropInput(handler) {
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
       this.dropZone.addEventListener(eventName, preventDefaults, false);
     });
@@ -34,7 +33,6 @@ class PanelView {
     this.dropZone.addEventListener(
       'drop',
       async function (e) {
-        console.log(e)
         let dt = e.dataTransfer;
         let files = dt.files;
         if (!files.length) return;
@@ -61,9 +59,10 @@ class PanelView {
     }
   }
   addHandlerRemoveImage(handler) {
-    this.preview.addEventListener(
+    this.imageList.addEventListener(
       'click',
       function (e) {
+        e.preventDefault();
         const removeBtn = e.target.closest('.preview__card--remove-btn');
         if (!removeBtn) return;
         e.stopImmediatePropagation();
@@ -74,9 +73,9 @@ class PanelView {
     );
   }
   addHandlerPreviewClick(handler) {
-    this.preview.addEventListener('click', function (e) {
+    this.imageList.addEventListener('click', function (e) {
       e.preventDefault();
-      const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
+      const imgIndex = e.target.closest('.preview__card')?.dataset.photoIndex;
       if (!imgIndex) return;
       handler(imgIndex);
     });
@@ -89,7 +88,7 @@ class PanelView {
     });
   }
   addHandlerLocationPreviewClick(handler) {
-    this.preview.addEventListener('click', function (e) {
+    this.imageList.addEventListener('click', function (e) {
       e.preventDefault();
       const locationPreviewCard = e.target.closest('.preview__card--location');
       if (!locationPreviewCard) return;
@@ -97,7 +96,7 @@ class PanelView {
     });
   }
   addHandlerRemoveCurrentLocation(handler) {
-    this.preview.addEventListener('click', function (e) {
+    this.imageList.addEventListener('click', function (e) {
       const removeBtn = e.target.closest('.location__card--remove-btn');
       if (!removeBtn) return;
       e.stopImmediatePropagation();
@@ -182,7 +181,7 @@ class PanelView {
     previewCard.appendChild(previewCardHeader);
     previewCard.appendChild(previewCardRemoveBtn);
     previewCard.appendChild(previewCardText);
-    this.preview.insertAdjacentElement('afterbegin', previewCard);
+    this.imageList.insertAdjacentElement('afterbegin', previewCard);
   }
   renderRoutePreviewCard(routeData) {
     const routeTime = miliToTime(routeData.paths[0].time);
@@ -197,7 +196,10 @@ class PanelView {
         'preview__card--route',
         'preview__card'
       );
-      this.preview.insertAdjacentElement('beforebegin', this.routePreviewCard);
+      this.imageList.insertAdjacentElement(
+        'beforebegin',
+        this.routePreviewCard
+      );
     }
     this.routePreviewCard.innerHTML = `
     <h4>Route</h4>
@@ -238,7 +240,7 @@ class PanelView {
     routePanelBackBtn.classList.add('route-panel--back-btn', 'btn--small');
     this.routePanel.appendChild(routePanelBackBtn);
 
-    this.preview.replaceChildren(this.routePanel);
+    this.imageList.replaceChildren(this.routePanel);
     // Add route instructions
     const routePanelInstructions = document.createElement('dl');
     routePanelInstructions.innerHTML = `${routeData.paths[0].instructions
@@ -265,7 +267,7 @@ class PanelView {
       );
       this.locationPreviewCard.setAttribute('draggable', 'true');
 
-      this.preview.insertAdjacentElement(
+      this.imageList.insertAdjacentElement(
         'afterbegin',
         this.locationPreviewCard
       );
