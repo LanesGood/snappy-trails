@@ -335,7 +335,9 @@ class PanelView {
   }
   // Render all cards from state
   renderAllImgs(state) {
-    state.uploadedImages.map((img) => this.renderPreviewCard(img));
+    state.images
+      .sort((a, b) => a.photoIndex - b.photoIndex)
+      .map((img) => this.renderPreviewCard(img));
   }
 }
 
