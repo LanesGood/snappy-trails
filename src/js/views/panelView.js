@@ -334,9 +334,10 @@ class PanelView {
     this.locationPreviewCard.appendChild(previewCardRemoveBtn);
   }
   // Render all cards from state
-  renderAllImgs(state) {
-    state.images
+  renderAllImgs(images) {
+    images
       .sort((a, b) => a.photoIndex - b.photoIndex)
+      .filter((img) => img.file != null)
       .map((img) => this.renderPreviewCard(img));
   }
 }

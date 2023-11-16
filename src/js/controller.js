@@ -63,7 +63,7 @@ const controlRouteCardClick = function () {
 };
 const controlRouteBackClick = function () {
   panelView.routePanel.remove();
-  panelView.renderAllImgs(state);
+  panelView.renderAllImgs(state.images);
   state.currentLatLng.length > 0 &&
     panelView.renderLocationCard(state.currentLatLng);
 };
@@ -197,7 +197,7 @@ const controlClear = function () {
 export const init = function () {
   console.log('Snappy trails is up and running. Reticulating splines');
 
-  state.images.length > 0 && panelView.renderAllImgs(state);
+  state.images.length > 0 && panelView.renderAllImgs(state.images);
   mapView.render();
   panelView.addHandlerUserLocation(controlUserLocation);
   panelView.addHandlerFileInput(controlAddFiles);
