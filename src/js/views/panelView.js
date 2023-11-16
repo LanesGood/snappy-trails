@@ -128,7 +128,56 @@ class PanelView {
       handler();
     });
   }
-  // Function to print image, info and coords to preview area
+  // Drag event listener for image cards
+  addHandlerDragPreviewCard() {
+    // Add dragging class to card when dragstart
+    this.imageList.addEventListener('dragstart', function (e) {
+      const previewCard = e.target.closest('.preview__card');
+      if (!previewCard) return;
+      previewCard.classList.add('dragging');
+    });
+    // Remove dragging class to card when dragstart
+    this.imageList.addEventListener('dragend', function (e) {
+      const previewCard = e.target.closest('.preview__card');
+      if (!previewCard) return;
+      previewCard.classList.remove('dragging');
+    });
+    // Add dragging class to card when dragstart
+    this.imageList.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      const draggingElement = document.querySelector('.dragging');
+      const afterElement = getDragAfterElement(this, e.clientY);
+      if (afterElement == null) {
+        this.appendChild(draggingElement);
+      } else {
+        this.insertBefore(draggingElement, afterElement);
+      }
+      // Reset card order according to UI order
+      const cards = [...this.querySelectorAll('.preview__card')];
+      cards.forEach((card, i) => {
+        card.setAttribute('data-photo-index', i);
+      });
+    });
+    // Function to determine which element in the list comes after current dragging element
+    function getDragAfterElement(container, y) {
+      const draggableElements = [
+        ...container.querySelectorAll('.preview__card:not(.dragging)'),
+      ];
+      return draggableElements.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
+          if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+          } else {
+            return closest;
+          }
+        },
+        { offset: Number.NEGATIVE_INFINITY }
+      ).element;
+    }
+  }
+  // Render function to print image, info and coords to preview area
   renderPreviewCard({
     file,
     file: { exifdata },

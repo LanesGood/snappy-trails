@@ -14,13 +14,18 @@
   position: relative;
   border: 2px solid var(--field);
   flex-shrink: 0;
-
+  cursor: grab;
   &:hover {
     background: white;
     color: var(--lake);
-    cursor: pointer;
     border-color: var(--lake);
     border-left-width: 8px;
+
+  }
+  &.dragging {
+    border-color: var(--lake);
+    border-width: 4px;
+    cursor: grabbing;
   }
 }
 .preview__card header {

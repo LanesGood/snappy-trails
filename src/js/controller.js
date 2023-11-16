@@ -202,6 +202,7 @@ export const init = function () {
   panelView.addHandlerFileInput(controlAddFiles);
   panelView.addHandlerDropInput(controlAddFiles);
   panelView.addHandlerPreviewClick(controlPreviewClick);
+  panelView.addHandlerDragPreviewCard();
   panelView.addHandlerLocationPreviewClick(controlLocationPreviewClick);
   panelView.addHandlerRemoveCurrentLocation(controlRemoveLocationPreview);
   panelView.addHandlerRemoveImage(controlRemoveImage);
