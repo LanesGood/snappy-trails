@@ -90,6 +90,7 @@ const controlUserLocation = async function (e) {
       state.currentLatLng.push(latitude, longitude);
       // Add current location from coordinates array
       state.images.push({
+        file: null,
         photoIndex: 1000,
         latitude,
         longitude,
