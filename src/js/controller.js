@@ -32,9 +32,7 @@ const controlAddFiles = async function (fileList) {
 
         mapView.renderPhotoMarker(latitude, longitude, file, photoIndex);
         panelView.renderPreviewCard(newImage);
-        mapView.map.flyToBounds(
-          state.images.map(({ latitude, longitude }) => [latitude, longitude])
-        );
+        mapView.flyToImageBounds(state.images);
       } catch (e) {
         console.error(e);
         alert('Could not extract location data for this image');
@@ -103,9 +101,7 @@ const controlUserLocation = async function (e) {
       // Add current location preview card
       panelView.renderLocationCard(state.currentLatLng);
       mapView.currentPositionMarker.openPopup();
-      mapView.map.flyToBounds(
-        state.images.map(({ latitude, longitude }) => [latitude, longitude])
-      );
+      mapView.flyToImageBounds(state.images);
     } catch (e) {
       console.error(e);
       alert('User location not available'); // Replace with toast
@@ -128,11 +124,9 @@ const controlUserLocation = async function (e) {
 
     // Set map view based on existing images
     if (state.images.length > 0) {
-      mapView.map.flyToBounds(
-        state.images.map(({ latitude, longitude }) => [latitude, longitude])
-      );
+      mapView.flyToImageBounds(state.images);
     } else {
-      mapView.map.flyTo([DEFAULT_COORDS[1], DEFAULT_COORDS[0]], 10);
+      mapView.flyToDefaultCoords();
     }
     // Remove location preview card
     panelView.imageList.removeChild(panelView.locationPreviewCard);
@@ -168,9 +162,7 @@ const controlSubmit = async function (transportMode) {
   state.transportMode = transportMode;
   const routeData = await model.getRoute(state.transportMode);
   state.routeData = routeData;
-  mapView.map.flyToBounds(
-    state.images.map(({ latitude, longitude }) => [latitude, longitude])
-  );
+  mapView.flyToImageBounds(state.images);
   mapView.renderRouteLine(state.routeData, state.transportMode);
   panelView.renderRoutePreviewCard(state.routeData);
 };
@@ -183,7 +175,7 @@ const controlClear = function () {
   // remove route from map
   mapView.clearRouteLine();
   // Reset map view
-  mapView.map.flyTo([DEFAULT_COORDS[1], DEFAULT_COORDS[0]], 10);
+  mapView.flyToDefaultCoords();
   // Remove all image previews
   panelView.imageList.replaceChildren();
   !!panelView.routePreviewCard && panelView.routePreviewCard.remove();
