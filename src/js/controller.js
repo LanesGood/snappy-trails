@@ -1,7 +1,6 @@
 import * as model from './model.js';
 import panelView from './views/panelView.js';
 import mapView from './views/mapView.js';
-import { DEFAULT_COORDS } from './config.js';
 
 if (module.hot) {
   module.hot.accept();
@@ -10,12 +9,13 @@ const { state } = model;
 
 const controlAddFiles = async function (fileList) {
   panelView._submitBtn.disabled = false;
-  let nextPhotoIndex = state.images.length; // Initialize with the current count
+  let nextImgOrder = state.images.length; // Initialize with the current count
   for (let i = 0; i < fileList.length; i++) {
     const file = fileList[i];
 
     if (!state.images.some((img) => img.file.name === file.name)) {
-      const photoIndex = nextPhotoIndex++;
+      const imgOrder = nextImgOrder++;
+      const imgId = imgOrder;
 
       try {
         const exifData = await model.getExifData(file);
@@ -23,14 +23,15 @@ const controlAddFiles = async function (fileList) {
 
         const newImage = {
           file,
-          photoIndex,
+          imgId,
+          imgOrder,
           latitude,
           longitude,
         };
 
         state.images.push(newImage);
 
-        mapView.renderPhotoMarker(latitude, longitude, file, photoIndex);
+        mapView.renderPhotoMarker(latitude, longitude, file, imgId);
         panelView.renderPreviewCard(newImage);
         mapView.flyToImageBounds(state.images);
       } catch (e) {
@@ -47,10 +48,10 @@ const controlAddFiles = async function (fileList) {
 };
 
 const controlPreviewClick = function (i) {
-  const img = state.images.find((img) => img.photoIndex === +i);
+  const img = state.images.find((img) => img.imgId === +i);
   mapView.map.flyTo([img.latitude, img.longitude], 15);
   mapView.photoMarkers.eachLayer((layer) => {
-    if (layer.photoIndex === +i) {
+    if (layer.imgId === +i) {
       layer.openPopup();
     }
   });
@@ -68,14 +69,14 @@ const controlRouteBackClick = function () {
 // Remove image from state and prevew when close (x) button clicked
 const controlRemoveImage = function (i) {
   mapView.photoMarkers.eachLayer((layer) => {
-    if (layer.photoIndex === +i) {
+    if (layer.imgId === +i) {
       mapView.map.removeLayer(layer);
     }
   });
   panelView.imageList.removeChild(
-    panelView.imageList.querySelector(`[data-photo-index="${i}"]`)
+    panelView.imageList.querySelector(`[data-img-id="${i}"]`)
   );
-  state.images = state.images.filter((img) => img.photoIndex !== +i);
+  state.images = state.images.filter((img) => img.imgId !== +i);
   mapView.clearRouteLine();
 };
 
@@ -89,7 +90,8 @@ const controlUserLocation = async function (e) {
       // Add current location from coordinates array
       state.images.push({
         file: null,
-        photoIndex: 1000,
+        imgId: 1000,
+        imgOrder: 1000,
         latitude,
         longitude,
       });
@@ -158,6 +160,16 @@ const controlRemoveLocationPreview = function () {
   }
 };
 
+// Update the model based on preview cards sorted via drag
+const controlImagesOrder = function () {
+  const sortOrder = [
+    ...panelView.imageList.querySelectorAll('.preview__card'),
+  ].map((el) => +el.getAttribute('data-img-id'));
+  state.images = state.images
+    .sort((a, b) => sortOrder.indexOf(a.imgId) - sortOrder.indexOf(b.imgId))
+    .map((img, i) => ({ ...img, imgOrder: i }));
+};
+
 const controlSubmit = async function (transportMode) {
   state.transportMode = transportMode;
   const routeData = await model.getRoute(state.transportMode);
@@ -195,7 +207,7 @@ export const init = function () {
   panelView.addHandlerFileInput(controlAddFiles);
   panelView.addHandlerDropInput(controlAddFiles);
   panelView.addHandlerPreviewClick(controlPreviewClick);
-  panelView.addHandlerDragPreviewCard();
+  panelView.addHandlerDragPreviewCard(controlImagesOrder);
   panelView.addHandlerLocationPreviewClick(controlLocationPreviewClick);
   panelView.addHandlerRemoveCurrentLocation(controlRemoveLocationPreview);
   panelView.addHandlerRemoveImage(controlRemoveImage);

@@ -50,7 +50,9 @@ export function getExifData(file) {
 
 export async function getRoute(transportMode) {
   try {
-    const pointArray = state.images.map(({ latitude, longitude }) => [+longitude, +latitude]);
+    const pointArray = state.images
+      .sort((a, b) => a.imgOrder - b.imgOrder)
+      .map(({ latitude, longitude }) => [+longitude, +latitude]);
     const query = new URLSearchParams({
       key: 'db56c0cf-613e-456d-baea-46650066da62', // remove from github
     }).toString();

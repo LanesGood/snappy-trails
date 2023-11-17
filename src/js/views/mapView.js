@@ -26,7 +26,7 @@ class MapView {
       autoClose: false,
     }).setContent(`<img class='marker-photo' src='${imageURL}' />`);
     const photoMarker = L.marker([latitude, longitude]);
-    photoMarker.photoIndex = i;
+    photoMarker.imgId = i;
     this.photoMarkers.addLayer(photoMarker);
     photoMarker.bindPopup(photoPopup).openPopup();
   }

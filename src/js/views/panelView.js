@@ -66,8 +66,8 @@ class PanelView {
         const removeBtn = e.target.closest('.preview__card--remove-btn');
         if (!removeBtn) return;
         e.stopImmediatePropagation();
-        const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
-        handler(imgIndex);
+        const imgId = e.target.closest('.preview__card').dataset.imgId;
+        handler(imgId);
       },
       true
     );
@@ -75,9 +75,9 @@ class PanelView {
   addHandlerPreviewClick(handler) {
     this.imageList.addEventListener('click', function (e) {
       e.preventDefault();
-      const imgIndex = e.target.closest('.preview__card')?.dataset.photoIndex;
-      if (!imgIndex) return;
-      handler(imgIndex);
+      const imgId = e.target.closest('.preview__card')?.dataset.imgId;
+      if (!imgId) return;
+      handler(imgId);
     });
   }
   addHandlerRouteCardClick(handler) {
@@ -129,7 +129,7 @@ class PanelView {
     });
   }
   // Drag event listener for image cards
-  addHandlerDragPreviewCard() {
+  addHandlerDragPreviewCard(handler) {
     // Add dragging class to card when dragstart
     this.imageList.addEventListener('dragstart', function (e) {
       const previewCard = e.target.closest('.preview__card');
@@ -155,9 +155,13 @@ class PanelView {
       // Reset card order according to UI order
       const cards = [...this.querySelectorAll('.preview__card')];
       cards.forEach((card, i) => {
-        card.setAttribute('data-photo-index', i);
+        card.setAttribute('data-img-order', i);
       });
     });
+    this.imageList.addEventListener('drop', function(e) {
+      e.preventDefault();
+      handler();
+    })
     // Function to determine which element in the list comes after current dragging element
     function getDragAfterElement(container, y) {
       const draggableElements = [
@@ -183,13 +187,16 @@ class PanelView {
     file: { exifdata },
     latitude,
     longitude,
-    photoIndex,
+    imgId,
+    imgOrder,
   }) {
     // Create preview card element
     const previewCard = document.createElement('div');
     previewCard.classList.add('preview__card');
     previewCard.setAttribute('draggable', 'true');
-    previewCard.dataset.photoIndex = photoIndex;
+    previewCard.setAttribute('title', 'Drag to reorder image');
+    previewCard.dataset.imgOrder = imgOrder;
+    previewCard.dataset.imgId = imgId;
     const previewCardHeader = document.createElement('div');
     previewCardHeader.classList.add('preview__card--header');
     const previewCardText = document.createElement('div');
@@ -197,7 +204,7 @@ class PanelView {
 
     // Create remove button
     const previewCardRemoveBtn = document.createElement('button');
-    previewCardRemoveBtn.innerText = 'x';
+    previewCardRemoveBtn.innerText = '✕';
     previewCardRemoveBtn.setAttribute('title', 'Remove this item');
     previewCardRemoveBtn.classList.add('preview__card--remove-btn');
 
@@ -230,7 +237,7 @@ class PanelView {
     previewCard.appendChild(previewCardHeader);
     previewCard.appendChild(previewCardRemoveBtn);
     previewCard.appendChild(previewCardText);
-    this.imageList.insertAdjacentElement('afterbegin', previewCard);
+    this.imageList.insertAdjacentElement('beforeend', previewCard);
   }
   renderRoutePreviewCard(routeData) {
     const routeTime = miliToTime(routeData.paths[0].time);
@@ -336,7 +343,7 @@ class PanelView {
   // Render all cards from state
   renderAllImgs(images) {
     images
-      .sort((a, b) => a.photoIndex - b.photoIndex)
+      .sort((a, b) => a.imgOrder - b.imgOrder)
       .filter((img) => img.file != null)
       .map((img) => this.renderPreviewCard(img));
   }
