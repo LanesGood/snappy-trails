@@ -6,7 +6,6 @@
   max-height: 9rem;
   background: white;
   align-items: stretch;
-  overflow: hidden;
   display: grid;
   grid-template-columns: 8rem 1fr;
   grid-template-rows: minmax(5px, 7.75rem);
@@ -14,13 +13,30 @@
   position: relative;
   border: 2px solid var(--field);
   flex-shrink: 0;
-
+  cursor: grab;
+  &:before {
+    content: "⠿";
+    font-size: 1.75rem;
+    position: absolute;
+    top: 35%;
+    right: 0.25rem;
+    font-weight: bold;
+    opacity: 0;
+    transition: all 0.24s;
+  }
   &:hover {
     background: white;
     color: var(--lake);
-    cursor: pointer;
     border-color: var(--lake);
     border-left-width: 8px;
+    &:before {
+      opacity: 1;
+    }
+  }
+  &.dragging {
+    border-color: var(--lake);
+    border-width: 4px;
+    cursor: grabbing;
   }
 }
 .preview__card header {
@@ -31,21 +47,24 @@
 .preview__card--remove-btn,
 .location__card--remove-btn {
   position: absolute;
-  top: 0.125rem;
+  top: 0.25rem;
   right: 0.25rem;
   text-transform: lowercase;
   font-size: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
   color: #656565;
   opacity: 0.5;
   background: transparent;
   box-shadow: none;
   padding: 0;
   border: none;
+  transition: all 0.24s;
   &:hover {
     transform: translateY(0);
-    background: none;
-    color: #820000;
-    border: none;
+    background: #e7e7e7;
+    color: #b30000;
+    opacity: 0.75;
   }
 }
 .preview__card--header {

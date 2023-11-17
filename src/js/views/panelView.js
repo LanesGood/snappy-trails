@@ -5,7 +5,7 @@ class PanelView {
   _submitBtn = document.querySelector('#submit-route-btn');
   _clearBtn = document.querySelector('#clear-btn');
   _userLocationInput = document.querySelector('#user-location');
-  preview = document.querySelector('#preview');
+  imageList = document.querySelector('#image_list');
   form = document.querySelector('form');
   dropZone = document.querySelector('#drop_zone');
   routePreviewCard;
@@ -20,8 +20,7 @@ class PanelView {
     });
   }
   // Drag and drop functions for file upload
-  addHandlerDragNDrop(handler) {
-    console.log('dnd fired');
+  addHandlerDropInput(handler) {
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
       this.dropZone.addEventListener(eventName, preventDefaults, false);
     });
@@ -34,7 +33,6 @@ class PanelView {
     this.dropZone.addEventListener(
       'drop',
       async function (e) {
-        console.log(e)
         let dt = e.dataTransfer;
         let files = dt.files;
         if (!files.length) return;
@@ -61,24 +59,25 @@ class PanelView {
     }
   }
   addHandlerRemoveImage(handler) {
-    this.preview.addEventListener(
+    this.imageList.addEventListener(
       'click',
       function (e) {
+        e.preventDefault();
         const removeBtn = e.target.closest('.preview__card--remove-btn');
         if (!removeBtn) return;
         e.stopImmediatePropagation();
-        const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
-        handler(imgIndex);
+        const imgId = e.target.closest('.preview__card').dataset.imgId;
+        handler(imgId);
       },
       true
     );
   }
   addHandlerPreviewClick(handler) {
-    this.preview.addEventListener('click', function (e) {
+    this.imageList.addEventListener('click', function (e) {
       e.preventDefault();
-      const imgIndex = e.target.closest('.preview__card').dataset.photoIndex;
-      if (!imgIndex) return;
-      handler(imgIndex);
+      const imgId = e.target.closest('.preview__card')?.dataset.imgId;
+      if (!imgId) return;
+      handler(imgId);
     });
   }
   addHandlerRouteCardClick(handler) {
@@ -89,7 +88,7 @@ class PanelView {
     });
   }
   addHandlerLocationPreviewClick(handler) {
-    this.preview.addEventListener('click', function (e) {
+    this.imageList.addEventListener('click', function (e) {
       e.preventDefault();
       const locationPreviewCard = e.target.closest('.preview__card--location');
       if (!locationPreviewCard) return;
@@ -97,7 +96,7 @@ class PanelView {
     });
   }
   addHandlerRemoveCurrentLocation(handler) {
-    this.preview.addEventListener('click', function (e) {
+    this.imageList.addEventListener('click', function (e) {
       const removeBtn = e.target.closest('.location__card--remove-btn');
       if (!removeBtn) return;
       e.stopImmediatePropagation();
@@ -129,19 +128,75 @@ class PanelView {
       handler();
     });
   }
-  // Function to print image, info and coords to preview area
+  // Drag event listener for image cards
+  addHandlerDragPreviewCard(handler) {
+    // Add dragging class to card when dragstart
+    this.imageList.addEventListener('dragstart', function (e) {
+      const previewCard = e.target.closest('.preview__card');
+      if (!previewCard) return;
+      previewCard.classList.add('dragging');
+    });
+    // Remove dragging class to card when dragstart
+    this.imageList.addEventListener('dragend', function (e) {
+      const previewCard = e.target.closest('.preview__card');
+      if (!previewCard) return;
+      previewCard.classList.remove('dragging');
+    });
+    // Add dragging class to card when dragstart
+    this.imageList.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      const draggingElement = document.querySelector('.dragging');
+      const afterElement = getDragAfterElement(this, e.clientY);
+      if (afterElement == null) {
+        this.appendChild(draggingElement);
+      } else {
+        this.insertBefore(draggingElement, afterElement);
+      }
+      // Reset card order according to UI order
+      const cards = [...this.querySelectorAll('.preview__card')];
+      cards.forEach((card, i) => {
+        card.setAttribute('data-img-order', i);
+      });
+    });
+    this.imageList.addEventListener('drop', function(e) {
+      e.preventDefault();
+      handler();
+    })
+    // Function to determine which element in the list comes after current dragging element
+    function getDragAfterElement(container, y) {
+      const draggableElements = [
+        ...container.querySelectorAll('.preview__card:not(.dragging)'),
+      ];
+      return draggableElements.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
+          if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+          } else {
+            return closest;
+          }
+        },
+        { offset: Number.NEGATIVE_INFINITY }
+      ).element;
+    }
+  }
+  // Render function to print image, info and coords to preview area
   renderPreviewCard({
     file,
     file: { exifdata },
     latitude,
     longitude,
-    photoIndex,
+    imgId,
+    imgOrder,
   }) {
     // Create preview card element
     const previewCard = document.createElement('div');
     previewCard.classList.add('preview__card');
     previewCard.setAttribute('draggable', 'true');
-    previewCard.dataset.photoIndex = photoIndex;
+    previewCard.setAttribute('title', 'Drag to reorder image');
+    previewCard.dataset.imgOrder = imgOrder;
+    previewCard.dataset.imgId = imgId;
     const previewCardHeader = document.createElement('div');
     previewCardHeader.classList.add('preview__card--header');
     const previewCardText = document.createElement('div');
@@ -149,7 +204,7 @@ class PanelView {
 
     // Create remove button
     const previewCardRemoveBtn = document.createElement('button');
-    previewCardRemoveBtn.innerText = 'x';
+    previewCardRemoveBtn.innerText = '✕';
     previewCardRemoveBtn.setAttribute('title', 'Remove this item');
     previewCardRemoveBtn.classList.add('preview__card--remove-btn');
 
@@ -182,7 +237,7 @@ class PanelView {
     previewCard.appendChild(previewCardHeader);
     previewCard.appendChild(previewCardRemoveBtn);
     previewCard.appendChild(previewCardText);
-    this.preview.insertAdjacentElement('afterbegin', previewCard);
+    this.imageList.insertAdjacentElement('beforeend', previewCard);
   }
   renderRoutePreviewCard(routeData) {
     const routeTime = miliToTime(routeData.paths[0].time);
@@ -197,7 +252,10 @@ class PanelView {
         'preview__card--route',
         'preview__card'
       );
-      this.preview.insertAdjacentElement('beforebegin', this.routePreviewCard);
+      this.imageList.insertAdjacentElement(
+        'beforebegin',
+        this.routePreviewCard
+      );
     }
     this.routePreviewCard.innerHTML = `
     <h4>Route</h4>
@@ -238,7 +296,7 @@ class PanelView {
     routePanelBackBtn.classList.add('route-panel--back-btn', 'btn--small');
     this.routePanel.appendChild(routePanelBackBtn);
 
-    this.preview.replaceChildren(this.routePanel);
+    this.imageList.replaceChildren(this.routePanel);
     // Add route instructions
     const routePanelInstructions = document.createElement('dl');
     routePanelInstructions.innerHTML = `${routeData.paths[0].instructions
@@ -265,7 +323,7 @@ class PanelView {
       );
       this.locationPreviewCard.setAttribute('draggable', 'true');
 
-      this.preview.insertAdjacentElement(
+      this.imageList.insertAdjacentElement(
         'afterbegin',
         this.locationPreviewCard
       );
@@ -283,8 +341,11 @@ class PanelView {
     this.locationPreviewCard.appendChild(previewCardRemoveBtn);
   }
   // Render all cards from state
-  renderAllImgs(state) {
-    state.uploadedImages.map((img) => this.renderPreviewCard(img));
+  renderAllImgs(images) {
+    images
+      .sort((a, b) => a.imgOrder - b.imgOrder)
+      .filter((img) => img.file != null)
+      .map((img) => this.renderPreviewCard(img));
   }
 }
 

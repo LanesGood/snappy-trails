@@ -1,6 +1,6 @@
 import { DEFAULT_COORDS } from '../config';
 import { miliToTime } from '../helpers';
-const { MAPBOX_TOKEN } = process.env
+const { MAPBOX_TOKEN } = process.env;
 class MapView {
   // Leaflet objects and initialization
   constructor() {
@@ -26,11 +26,18 @@ class MapView {
       autoClose: false,
     }).setContent(`<img class='marker-photo' src='${imageURL}' />`);
     const photoMarker = L.marker([latitude, longitude]);
-    photoMarker.photoIndex = i;
+    photoMarker.imgId = i;
     this.photoMarkers.addLayer(photoMarker);
     photoMarker.bindPopup(photoPopup).openPopup();
   }
-
+  flyToDefaultCoords() {
+    this.map.flyTo([DEFAULT_COORDS[1], DEFAULT_COORDS[0]], 10);
+  }
+  flyToImageBounds(images) {
+    this.map.flyToBounds(
+      images.map(({ latitude, longitude }) => [latitude, longitude])
+    );
+  }
   renderRouteLine(routeData, transportMode) {
     const routeCoords = routeData.paths[0].points.coordinates.map((coords) => [
       coords[1],
@@ -40,7 +47,7 @@ class MapView {
     this.routeLine.setLatLngs(routeCoords).addTo(this.map);
     this.routeLine.bindPopup(`${transportMode}: ${routeTime}`).openPopup();
   }
-  clearRouteLine(){
+  clearRouteLine() {
     this.routeLine = L.polyline([]);
   }
 }
