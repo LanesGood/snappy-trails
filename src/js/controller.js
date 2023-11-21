@@ -12,7 +12,7 @@ const controlAddFiles = async function (fileList) {
   for (let i = 0; i < fileList.length; i++) {
     const file = fileList[i];
 
-    if (!state.images.some((img) => img.file.name === file.name)) {
+    if (!state.images.some((img) => img.file?.name === file.name)) {
       const imgOrder = nextImgOrder++;
       const imgId = crypto.randomUUID();
 
@@ -91,7 +91,7 @@ const controlUserLocation = async function (e) {
       // Add current location from coordinates array
       state.images.push({
         file: null,
-        imgId: 1000,
+        imgId: '1000',
         imgOrder: 1000,
         latitude,
         longitude,
@@ -149,7 +149,7 @@ const controlRemoveLocationPreview = function () {
   state.images = state.images.filter(
     (image) =>
       !(
-        image.latitutde === state.currentLatLng[0] &&
+        image.latitude === state.currentLatLng[0] &&
         image.longitude === state.currentLatLng[1]
       )
   );
@@ -199,7 +199,7 @@ const controlClear = function () {
 
   // reset to default coords/world view
   panelView.form.reset();
-  panelView._submitBtn.disabled = true;
+  panelView.checkSubmitBtn(state.images.length)
 };
 
 export const init = function () {

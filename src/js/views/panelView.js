@@ -333,6 +333,7 @@ class PanelView {
       <span><p>${location[0].toFixed(2)},${location[1].toFixed(2)}</p>
       </span></header>
     `;
+    this.locationPreviewCard.dataset.imgId = 1000;
     // Create remove button
     const previewCardRemoveBtn = document.createElement('button');
     previewCardRemoveBtn.innerText = 'x';
