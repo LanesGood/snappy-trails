@@ -168,7 +168,7 @@ const controlRemoveLocationPreview = function () {
 const controlImagesOrder = function () {
   const sortOrder = [
     ...panelView.imageList.querySelectorAll('.preview__card'),
-  ].map((el) => +el.getAttribute('data-img-id'));
+  ].map((el) => el.getAttribute('data-img-id'));
   state.images = state.images
     .sort((a, b) => sortOrder.indexOf(a.imgId) - sortOrder.indexOf(b.imgId))
     .map((img, i) => ({ ...img, imgOrder: i }));
