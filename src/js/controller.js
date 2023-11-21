@@ -14,7 +14,7 @@ const controlAddFiles = async function (fileList) {
 
     if (!state.images.some((img) => img.file.name === file.name)) {
       const imgOrder = nextImgOrder++;
-      const imgId = imgOrder;
+      const imgId = crypto.randomUUID();
 
       try {
         const exifData = await model.getExifData(file);
@@ -48,10 +48,10 @@ const controlAddFiles = async function (fileList) {
 };
 
 const controlPreviewClick = function (i) {
-  const img = state.images.find((img) => img.imgId === +i);
+  const img = state.images.find((img) => img.imgId === i);
   mapView.map.flyTo([img.latitude, img.longitude], 15);
   mapView.photoMarkers.eachLayer((layer) => {
-    if (layer.imgId === +i) {
+    if (layer.imgId === i) {
       layer.openPopup();
     }
   });
@@ -69,14 +69,14 @@ const controlRouteBackClick = function () {
 // Remove image from state and prevew when close (x) button clicked
 const controlRemoveImage = function (i) {
   mapView.photoMarkers.eachLayer((layer) => {
-    if (layer.imgId === +i) {
+    if (layer.imgId === i) {
       mapView.map.removeLayer(layer);
     }
   });
   panelView.imageList.removeChild(
     panelView.imageList.querySelector(`[data-img-id="${i}"]`)
   );
-  state.images = state.images.filter((img) => img.imgId !== +i);
+  state.images = state.images.filter((img) => img.imgId !== i);
   mapView.clearRouteLine();
   panelView.checkSubmitBtn(state.images.length);
 };
