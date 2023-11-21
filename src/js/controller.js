@@ -8,7 +8,6 @@ if (module.hot) {
 const { state } = model;
 
 const controlAddFiles = async function (fileList) {
-  panelView._submitBtn.disabled = false;
   let nextImgOrder = state.images.length; // Initialize with the current count
   for (let i = 0; i < fileList.length; i++) {
     const file = fileList[i];
@@ -45,6 +44,7 @@ const controlAddFiles = async function (fileList) {
 
   mapView.clearRouteLine();
   panelView.input.value = '';
+  if (state.images.length >= 2) panelView._submitBtn.disabled = false;
 };
 
 const controlPreviewClick = function (i) {
@@ -191,7 +191,7 @@ const controlClear = function () {
   // Remove all image previews
   panelView.imageList.replaceChildren();
   !!panelView.routePreviewCard && panelView.routePreviewCard.remove();
-  panelView.routePanel.remove();
+  !!panelView.routePanel && panelView.routePanel.remove();
 
   // reset to default coords/world view
   panelView.form.reset();
