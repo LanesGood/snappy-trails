@@ -48,7 +48,7 @@ class MapView {
     this.routeLine.bindPopup(`${transportMode}: ${routeTime}`).openPopup();
   }
   clearRouteLine() {
-    this.routeLine = L.polyline([]);
+    this.routeLine.remove();
   }
 }
 export default new MapView();
