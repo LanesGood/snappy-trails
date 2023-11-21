@@ -63,8 +63,6 @@ const controlRouteCardClick = function () {
 const controlRouteBackClick = function () {
   panelView.routePanel.remove();
   panelView.renderAllImgs(state.images);
-  state.currentLatLng.length > 0 &&
-    panelView.renderLocationCard(state.currentLatLng);
 };
 // Remove image from state and prevew when close (x) button clicked
 const controlRemoveImage = function (i) {
@@ -87,22 +85,22 @@ const controlUserLocation = async function (e) {
       const {
         coords: { latitude, longitude },
       } = await model.getPosition();
-      state.currentLatLng.push(latitude, longitude);
-      // Add current location from coordinates array
+      // Add current location to images array
       state.images.push({
         file: null,
-        imgId: '1000',
+        imgId: 'currentCoords',
         imgOrder: 1000,
         latitude,
         longitude,
+        currentPosition: true,
       });
       // Add current location marker
-      mapView.currentPositionMarker.setLatLng(state.currentLatLng);
+      mapView.currentPositionMarker.setLatLng([latitude, longitude]);
       mapView.currentPositionMarker.bindPopup('Current location');
       mapView.photoMarkers.addLayer(mapView.currentPositionMarker);
 
       // Add current location preview card
-      panelView.renderLocationCard(state.currentLatLng);
+      panelView.renderLocationCard([latitude, longitude]);
       mapView.currentPositionMarker.openPopup();
       mapView.flyToImageBounds(state.images);
       panelView.checkSubmitBtn(state.images.length);
@@ -116,15 +114,7 @@ const controlUserLocation = async function (e) {
       mapView.map.removeLayer(mapView.currentPositionMarker);
     }
     // Remove current location from coords array
-    state.images = state.images.filter(
-      (image) =>
-        !(
-          image.latitude === state.currentLatLng[0] &&
-          image.longitude === state.currentLatLng[1]
-        )
-    );
-    // Remove current lat long
-    state.currentLatLng.length = 0;
+    state.images = state.images.filter(image => !image.currentPosition);
 
     // Set map view based on existing images
     if (state.images.length > 0) {
@@ -141,20 +131,13 @@ const controlUserLocation = async function (e) {
   }
 };
 const controlLocationPreviewClick = function () {
-  mapView.map.flyTo([state.currentLatLng[0], state.currentLatLng[1]], 15);
+  let currentCoords = state.images.find(image => image.currentPosition);
+  mapView.map.flyTo([currentCoords.latitude, currentCoords.longitude], 15);
 };
 
 const controlRemoveLocationPreview = function () {
   // Remove current location from coords array
-  state.images = state.images.filter(
-    (image) =>
-      !(
-        image.latitude === state.currentLatLng[0] &&
-        image.longitude === state.currentLatLng[1]
-      )
-  );
-  // Remove current lat long
-  state.currentLatLng.length = 0;
+  state.images = state.images.filter(image => !image.currentPosition);
   // Remove location preview card
   panelView.imageList.removeChild(panelView.locationPreviewCard);
   panelView.checkSubmitBtn(state.images.length);
@@ -199,7 +182,7 @@ const controlClear = function () {
 
   // reset to default coords/world view
   panelView.form.reset();
-  panelView.checkSubmitBtn(state.images.length)
+  panelView.checkSubmitBtn(state.images.length);
 };
 
 export const init = function () {

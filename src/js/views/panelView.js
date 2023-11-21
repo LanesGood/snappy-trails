@@ -333,7 +333,8 @@ class PanelView {
       <span><p>${location[0].toFixed(2)},${location[1].toFixed(2)}</p>
       </span></header>
     `;
-    this.locationPreviewCard.dataset.imgId = 1000;
+    this.locationPreviewCard.dataset.imgId = 'currentCoords';
+    this.locationPreviewCard.dataset.imgOrder = 0;
     // Create remove button
     const previewCardRemoveBtn = document.createElement('button');
     previewCardRemoveBtn.innerText = 'x';
@@ -345,8 +346,11 @@ class PanelView {
   renderAllImgs(images) {
     images
       .sort((a, b) => a.imgOrder - b.imgOrder)
-      .filter((img) => img.file != null)
-      .map((img) => this.renderPreviewCard(img));
+      .map((img) =>
+        img.currentPosition
+          ? this.renderLocationCard([img.latitude, img.longitude])
+          : this.renderPreviewCard(img)
+      );
   }
   checkSubmitBtn(numImages) {
     this._submitBtn.disabled = numImages >= 2 ? false : true;
