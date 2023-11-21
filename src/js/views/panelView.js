@@ -158,10 +158,10 @@ class PanelView {
         card.setAttribute('data-img-order', i);
       });
     });
-    this.imageList.addEventListener('drop', function(e) {
+    this.imageList.addEventListener('drop', function (e) {
       e.preventDefault();
       handler();
-    })
+    });
     // Function to determine which element in the list comes after current dragging element
     function getDragAfterElement(container, y) {
       const draggableElements = [
@@ -346,6 +346,9 @@ class PanelView {
       .sort((a, b) => a.imgOrder - b.imgOrder)
       .filter((img) => img.file != null)
       .map((img) => this.renderPreviewCard(img));
+  }
+  checkSubmitBtn(numImages) {
+    this._submitBtn.disabled = numImages >= 2 ? false : true;
   }
 }
 

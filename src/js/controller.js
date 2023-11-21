@@ -44,7 +44,7 @@ const controlAddFiles = async function (fileList) {
 
   mapView.clearRouteLine();
   panelView.input.value = '';
-  if (state.images.length >= 2) panelView._submitBtn.disabled = false;
+  panelView.checkSubmitBtn(state.images.length);
 };
 
 const controlPreviewClick = function (i) {
@@ -78,6 +78,7 @@ const controlRemoveImage = function (i) {
   );
   state.images = state.images.filter((img) => img.imgId !== +i);
   mapView.clearRouteLine();
+  panelView.checkSubmitBtn(state.images.length);
 };
 
 const controlUserLocation = async function (e) {
@@ -104,6 +105,7 @@ const controlUserLocation = async function (e) {
       panelView.renderLocationCard(state.currentLatLng);
       mapView.currentPositionMarker.openPopup();
       mapView.flyToImageBounds(state.images);
+      panelView.checkSubmitBtn(state.images.length);
     } catch (e) {
       console.error(e);
       alert('User location not available'); // Replace with toast
@@ -134,6 +136,7 @@ const controlUserLocation = async function (e) {
     panelView.imageList.removeChild(panelView.locationPreviewCard);
     // Remove current position marker
     mapView.photoMarkers.removeLayer(mapView.currentPositionMarker);
+    panelView.checkSubmitBtn(state.images.length);
     return state.images;
   }
 };
@@ -154,6 +157,7 @@ const controlRemoveLocationPreview = function () {
   state.currentLatLng.length = 0;
   // Remove location preview card
   panelView.imageList.removeChild(panelView.locationPreviewCard);
+  panelView.checkSubmitBtn(state.images.length);
   // Remove map marker for current location
   if (mapView.map.hasLayer(mapView.currentPositionMarker)) {
     mapView.map.removeLayer(mapView.currentPositionMarker);
