@@ -1,12 +1,11 @@
 import { miliToTime, round, toMiles, ROUTE_MODES } from '../helpers';
 class PanelView {
-  _parentElement = document.querySelector('#upload-form');
+  uploadForm = document.querySelector('#upload-form');
   input = document.querySelector('#fileInput');
   _submitBtn = document.querySelector('#submit-route-btn');
   _clearBtn = document.querySelector('#clear-btn');
   _userLocationInput = document.querySelector('#user-location');
   imageList = document.querySelector('#image_list');
-  form = document.querySelector('form');
   dropZone = document.querySelector('#drop_zone');
   routePreviewCard;
   routePanel;
@@ -106,9 +105,9 @@ class PanelView {
     });
   }
   addHandlerSubmit(handler) {
-    this.form.addEventListener('submit', async (e) => {
+    this.uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const formData = new FormData(this.form);
+      const formData = new FormData(this.uploadForm);
       const transportMode = formData.get('transport-mode');
       handler(transportMode);
     });
@@ -237,6 +236,7 @@ class PanelView {
     previewCard.appendChild(previewCardHeader);
     previewCard.appendChild(previewCardRemoveBtn);
     previewCard.appendChild(previewCardText);
+    
     this.imageList.insertAdjacentElement('beforeend', previewCard);
   }
   renderRoutePreviewCard(routeData, transportMode) {
@@ -313,7 +313,6 @@ class PanelView {
     const routePanelInstructions = document.createElement('dl');
     routePanelInstructions.innerHTML = `${routeData.paths[0].instructions
       .map((step, index) => {
-        console.log(step);
         return `
         <dt>${index + 1}</dt>
         <dd>${step.text}</dd>
