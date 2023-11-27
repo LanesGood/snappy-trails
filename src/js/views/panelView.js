@@ -1,4 +1,4 @@
-import { miliToTime, round, toMiles } from '../helpers';
+import { miliToTime, round, toMiles, ROUTE_MODES } from '../helpers';
 class PanelView {
   _parentElement = document.querySelector('#upload-form');
   input = document.querySelector('#fileInput');
@@ -239,7 +239,7 @@ class PanelView {
     previewCard.appendChild(previewCardText);
     this.imageList.insertAdjacentElement('beforeend', previewCard);
   }
-  renderRoutePreviewCard(routeData) {
+  renderRoutePreviewCard(routeData, transportMode) {
     const routeTime = miliToTime(routeData.paths[0].time);
     const routeDistance = routeData.paths[0].distance;
     const routePreviewEl = document.getElementsByClassName(
@@ -258,13 +258,14 @@ class PanelView {
       );
     }
     this.routePreviewCard.innerHTML = `
-    <h4>Route</h4>
+    <h4>${ROUTE_MODES[transportMode]} Route</h4>
     <span><h4>${routeTime}</h4>
     <p>${round(toMiles(routeDistance), 100)} mi</p>
     </span>
     `;
   }
   renderRoutePanel(routeData, transportMode) {
+    const routemode = ROUTE_MODES[transportMode];
     const routeTime = miliToTime(routeData.paths[0].time);
     const routeDistance = routeData.paths[0].distance;
     const routePreviewEl = document.getElementsByClassName('route-panel');
@@ -272,42 +273,56 @@ class PanelView {
       this.routePanel = document.createElement('div');
       this.routePanel.classList.add('route-panel', 'preview__card--text');
     }
+    const routePanelHeader = document.createElement('header');
+    const routePanelTitle = document.createElement('h2');
+    routePanelTitle.innerHTML = `${routemode} Route`;
+    routePanelHeader.appendChild(routePanelTitle);
 
     const startPoint = routeData.paths[0].points.coordinates[0]
-      .map((e) => e.toFixed(2))
+      .map((e) => e.toFixed(3))
       .join(', ');
     const endPoint = routeData.paths[0].points.coordinates
       .pop()
-      .map((e) => e.toFixed(2))
+      .map((e) => e.toFixed(3))
       .join(', ');
-    this.routePanel.innerHTML = `
-    <h3>${transportMode} Route</h3>
-    <p>From <strong>${startPoint}</strong></p>
-    <p>To <strong>${endPoint}</strong></p>
-    <h2>
-    ${routeTime} <span>(${round(toMiles(routeDistance), 100)} miles)</span>
-    </h2>
+    const routeOverview = document.createElement('div');
+    routeOverview.classList.add('route-panel__overview');
+    routeOverview.innerHTML = `
+    <p>From: <strong>${startPoint}</strong></p>
+    <p>To: <strong>${endPoint}</strong></p>
     `;
+    routeOverview.insertAdjacentHTML(
+      'beforeend',
+      `<p class="route-length"><strong>${routeTime}</strong> (${round(
+        toMiles(routeDistance),
+        100
+      )} miles)</p>`
+    );
 
     // Create back button
     const routePanelBackBtn = document.createElement('button');
-    routePanelBackBtn.innerText = '← Back';
-    routePanelBackBtn.setAttribute('title', 'Back');
+    routePanelBackBtn.innerText = '←';
+    routePanelBackBtn.setAttribute('title', 'Back to image list');
     routePanelBackBtn.classList.add('route-panel--back-btn', 'btn--small');
-    this.routePanel.appendChild(routePanelBackBtn);
 
-    this.imageList.replaceChildren(this.routePanel);
+    routeOverview.appendChild(routePanelBackBtn);
+    routePanelHeader.appendChild(routeOverview);
+    this.routePanel.appendChild(routePanelHeader);
+
     // Add route instructions
     const routePanelInstructions = document.createElement('dl');
     routePanelInstructions.innerHTML = `${routeData.paths[0].instructions
       .map((step, index) => {
+        console.log(step);
         return `
         <dt>${index + 1}</dt>
         <dd>${step.text}</dd>
-      `;
+        `;
       })
       .join('')}`;
     this.routePanel.appendChild(routePanelInstructions);
+
+    this.imageList.replaceChildren(this.routePanel);
   }
   renderLocationCard(location) {
     if (!location) return;

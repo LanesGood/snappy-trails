@@ -163,7 +163,7 @@ const controlSubmit = async function (transportMode) {
   state.routeData = routeData;
   mapView.flyToImageBounds(state.images);
   mapView.renderRouteLine(state.routeData, state.transportMode);
-  panelView.renderRoutePreviewCard(state.routeData);
+  panelView.renderRoutePreviewCard(state.routeData, state.transportMode);
 };
 
 const controlClear = function () {

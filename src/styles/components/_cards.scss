@@ -7,8 +7,8 @@
   background: white;
   align-items: stretch;
   display: grid;
-  grid-template-columns: 8rem 1fr;
-  grid-template-rows: minmax(5px, 7.75rem);
+  grid-template-rows: minmax(5px, 7rem);
+  grid-template-columns: 7rem 1fr;
   transition: all 0.24s;
   position: relative;
   border: 2px solid var(--field);
@@ -97,13 +97,15 @@
     transform: none;
     box-shadow: none;
     background-color: var(--lake);
+    h4, span, p {
+      color: #fff;
+    }
+  }
+  &:before {
+    content: none;
   }
 }
-.preview__card--route:hover.preview__card--text dl,
-.preview__card--route:hover.preview__card--text dt,
-.preview__card--route:hover.preview__card--text h4 {
-  color: white;
-}
+
 .preview__card--text {
   font-size: 0.875rem;
   padding: 0.75rem 0.5rem;
@@ -121,18 +123,37 @@
     align-items: baseline;
     padding: 0;
     margin: 0;
-    gap: 0.5rem 0.25rem;
+    gap: 0.25rem 1rem;
   }
   & dt {
     padding: 0;
     margin: 0;
     text-transform: uppercase;
     font-size: 0.75rem;
+    font-weight: bold;
     letter-spacing: 0.25px;
     color: #808080;
   }
   & dd {
     padding: 0;
     margin: 0;
+  }
+}
+.route-panel.preview__card--text {
+  h3,
+  h4 {
+    text-transform: capitalize;
+  }
+  & dl {
+    grid-template-columns: 2rem 1fr;
+    gap: 0.25rem;
+  }
+  & dt {
+    font-size: 0.875rem;
+    color: inherit;
+    font-weight: normal;
+  }
+  & dd {
+    font-weight: 600;
   }
 }
