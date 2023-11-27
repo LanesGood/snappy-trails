@@ -1,5 +1,5 @@
 import { DEFAULT_COORDS } from '../config';
-import { miliToTime } from '../helpers';
+import { miliToTime, ROUTE_MODES } from '../helpers';
 const { MAPBOX_TOKEN } = process.env;
 class MapView {
   // Leaflet objects and initialization
@@ -45,10 +45,10 @@ class MapView {
     ]);
     const routeTime = miliToTime(routeData.paths[0].time);
     this.routeLine.setLatLngs(routeCoords).addTo(this.map);
-    this.routeLine.bindPopup(`${transportMode}: ${routeTime}`).openPopup();
+    this.routeLine.bindPopup(`${ROUTE_MODES[transportMode]}: ${routeTime}`).openPopup();
   }
   clearRouteLine() {
-    this.routeLine = L.polyline([]);
+    this.routeLine.remove();
   }
 }
 export default new MapView();

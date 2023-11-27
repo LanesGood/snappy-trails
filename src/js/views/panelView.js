@@ -1,12 +1,11 @@
-import { miliToTime, round, toMiles } from '../helpers';
+import { miliToTime, round, toMiles, ROUTE_MODES } from '../helpers';
 class PanelView {
-  _parentElement = document.querySelector('#upload-form');
+  uploadForm = document.querySelector('#upload-form');
   input = document.querySelector('#fileInput');
   _submitBtn = document.querySelector('#submit-route-btn');
   _clearBtn = document.querySelector('#clear-btn');
   _userLocationInput = document.querySelector('#user-location');
   imageList = document.querySelector('#image_list');
-  form = document.querySelector('form');
   dropZone = document.querySelector('#drop_zone');
   routePreviewCard;
   routePanel;
@@ -106,9 +105,9 @@ class PanelView {
     });
   }
   addHandlerSubmit(handler) {
-    this.form.addEventListener('submit', async (e) => {
+    this.uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const formData = new FormData(this.form);
+      const formData = new FormData(this.uploadForm);
       const transportMode = formData.get('transport-mode');
       handler(transportMode);
     });
@@ -158,10 +157,10 @@ class PanelView {
         card.setAttribute('data-img-order', i);
       });
     });
-    this.imageList.addEventListener('drop', function(e) {
+    this.imageList.addEventListener('drop', function (e) {
       e.preventDefault();
       handler();
-    })
+    });
     // Function to determine which element in the list comes after current dragging element
     function getDragAfterElement(container, y) {
       const draggableElements = [
@@ -237,9 +236,10 @@ class PanelView {
     previewCard.appendChild(previewCardHeader);
     previewCard.appendChild(previewCardRemoveBtn);
     previewCard.appendChild(previewCardText);
+    
     this.imageList.insertAdjacentElement('beforeend', previewCard);
   }
-  renderRoutePreviewCard(routeData) {
+  renderRoutePreviewCard(routeData, transportMode) {
     const routeTime = miliToTime(routeData.paths[0].time);
     const routeDistance = routeData.paths[0].distance;
     const routePreviewEl = document.getElementsByClassName(
@@ -258,13 +258,14 @@ class PanelView {
       );
     }
     this.routePreviewCard.innerHTML = `
-    <h4>Route</h4>
+    <h4>${ROUTE_MODES[transportMode]} Route</h4>
     <span><h4>${routeTime}</h4>
     <p>${round(toMiles(routeDistance), 100)} mi</p>
     </span>
     `;
   }
   renderRoutePanel(routeData, transportMode) {
+    const routemode = ROUTE_MODES[transportMode];
     const routeTime = miliToTime(routeData.paths[0].time);
     const routeDistance = routeData.paths[0].distance;
     const routePreviewEl = document.getElementsByClassName('route-panel');
@@ -272,31 +273,42 @@ class PanelView {
       this.routePanel = document.createElement('div');
       this.routePanel.classList.add('route-panel', 'preview__card--text');
     }
+    const routePanelHeader = document.createElement('header');
+    const routePanelTitle = document.createElement('h2');
+    routePanelTitle.innerHTML = `${routemode} Route`;
+    routePanelHeader.appendChild(routePanelTitle);
 
     const startPoint = routeData.paths[0].points.coordinates[0]
-      .map((e) => e.toFixed(2))
+      .map((e) => e.toFixed(3))
       .join(', ');
     const endPoint = routeData.paths[0].points.coordinates
       .pop()
-      .map((e) => e.toFixed(2))
+      .map((e) => e.toFixed(3))
       .join(', ');
-    this.routePanel.innerHTML = `
-    <h3>${transportMode} Route</h3>
-    <p>From <strong>${startPoint}</strong></p>
-    <p>To <strong>${endPoint}</strong></p>
-    <h2>
-    ${routeTime} <span>(${round(toMiles(routeDistance), 100)} miles)</span>
-    </h2>
+    const routeOverview = document.createElement('div');
+    routeOverview.classList.add('route-panel__overview');
+    routeOverview.innerHTML = `
+    <p>From: <strong>${startPoint}</strong></p>
+    <p>To: <strong>${endPoint}</strong></p>
     `;
+    routeOverview.insertAdjacentHTML(
+      'beforeend',
+      `<p class="route-length"><strong>${routeTime}</strong> (${round(
+        toMiles(routeDistance),
+        100
+      )} miles)</p>`
+    );
 
     // Create back button
     const routePanelBackBtn = document.createElement('button');
-    routePanelBackBtn.innerText = '← Back';
-    routePanelBackBtn.setAttribute('title', 'Back');
+    routePanelBackBtn.innerText = '←';
+    routePanelBackBtn.setAttribute('title', 'Back to image list');
     routePanelBackBtn.classList.add('route-panel--back-btn', 'btn--small');
-    this.routePanel.appendChild(routePanelBackBtn);
 
-    this.imageList.replaceChildren(this.routePanel);
+    routeOverview.appendChild(routePanelBackBtn);
+    routePanelHeader.appendChild(routeOverview);
+    this.routePanel.appendChild(routePanelHeader);
+
     // Add route instructions
     const routePanelInstructions = document.createElement('dl');
     routePanelInstructions.innerHTML = `${routeData.paths[0].instructions
@@ -304,10 +316,12 @@ class PanelView {
         return `
         <dt>${index + 1}</dt>
         <dd>${step.text}</dd>
-      `;
+        `;
       })
       .join('')}`;
     this.routePanel.appendChild(routePanelInstructions);
+
+    this.imageList.replaceChildren(this.routePanel);
   }
   renderLocationCard(location) {
     if (!location) return;
@@ -333,6 +347,8 @@ class PanelView {
       <span><p>${location[0].toFixed(2)},${location[1].toFixed(2)}</p>
       </span></header>
     `;
+    this.locationPreviewCard.dataset.imgId = 'currentCoords';
+    this.locationPreviewCard.dataset.imgOrder = 0;
     // Create remove button
     const previewCardRemoveBtn = document.createElement('button');
     previewCardRemoveBtn.innerText = 'x';
@@ -344,8 +360,14 @@ class PanelView {
   renderAllImgs(images) {
     images
       .sort((a, b) => a.imgOrder - b.imgOrder)
-      .filter((img) => img.file != null)
-      .map((img) => this.renderPreviewCard(img));
+      .map((img) =>
+        img.currentPosition
+          ? this.renderLocationCard([img.latitude, img.longitude])
+          : this.renderPreviewCard(img)
+      );
+  }
+  checkSubmitBtn(numImages) {
+    this._submitBtn.disabled = numImages >= 2 ? false : true;
   }
 }
 

@@ -1,7 +1,6 @@
 import { ConvertDMSToDD } from './helpers.js';
 export const state = {
   images: [],
-  currentLatLng: [],
   transportMode: '',
   routeData: {},
 };

@@ -23,3 +23,9 @@ export function ConvertDMSToDD(degrees, minutes, seconds, direction) {
   }
   return dd;
 }
+
+export const ROUTE_MODES = {
+  foot: 'Hike',
+  bike: 'Bike',
+  car: 'Car'
+};

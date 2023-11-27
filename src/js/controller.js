@@ -8,14 +8,13 @@ if (module.hot) {
 const { state } = model;
 
 const controlAddFiles = async function (fileList) {
-  panelView._submitBtn.disabled = false;
   let nextImgOrder = state.images.length; // Initialize with the current count
   for (let i = 0; i < fileList.length; i++) {
     const file = fileList[i];
 
-    if (!state.images.some((img) => img.file.name === file.name)) {
+    if (!state.images.some((img) => img.file?.name === file.name)) {
       const imgOrder = nextImgOrder++;
-      const imgId = imgOrder;
+      const imgId = crypto.randomUUID();
 
       try {
         const exifData = await model.getExifData(file);
@@ -45,13 +44,14 @@ const controlAddFiles = async function (fileList) {
 
   mapView.clearRouteLine();
   panelView.input.value = '';
+  panelView.checkSubmitBtn(state.images.length);
 };
 
 const controlPreviewClick = function (i) {
-  const img = state.images.find((img) => img.imgId === +i);
+  const img = state.images.find((img) => img.imgId === i);
   mapView.map.flyTo([img.latitude, img.longitude], 15);
   mapView.photoMarkers.eachLayer((layer) => {
-    if (layer.imgId === +i) {
+    if (layer.imgId === i) {
       layer.openPopup();
     }
   });
@@ -63,21 +63,20 @@ const controlRouteCardClick = function () {
 const controlRouteBackClick = function () {
   panelView.routePanel.remove();
   panelView.renderAllImgs(state.images);
-  state.currentLatLng.length > 0 &&
-    panelView.renderLocationCard(state.currentLatLng);
 };
 // Remove image from state and prevew when close (x) button clicked
 const controlRemoveImage = function (i) {
   mapView.photoMarkers.eachLayer((layer) => {
-    if (layer.imgId === +i) {
+    if (layer.imgId === i) {
       mapView.map.removeLayer(layer);
     }
   });
   panelView.imageList.removeChild(
     panelView.imageList.querySelector(`[data-img-id="${i}"]`)
   );
-  state.images = state.images.filter((img) => img.imgId !== +i);
+  state.images = state.images.filter((img) => img.imgId !== i);
   mapView.clearRouteLine();
+  panelView.checkSubmitBtn(state.images.length);
 };
 
 const controlUserLocation = async function (e) {
@@ -86,24 +85,25 @@ const controlUserLocation = async function (e) {
       const {
         coords: { latitude, longitude },
       } = await model.getPosition();
-      state.currentLatLng.push(latitude, longitude);
-      // Add current location from coordinates array
+      // Add current location to images array
       state.images.push({
         file: null,
-        imgId: 1000,
+        imgId: 'currentCoords',
         imgOrder: 1000,
         latitude,
         longitude,
+        currentPosition: true,
       });
       // Add current location marker
-      mapView.currentPositionMarker.setLatLng(state.currentLatLng);
+      mapView.currentPositionMarker.setLatLng([latitude, longitude]);
       mapView.currentPositionMarker.bindPopup('Current location');
       mapView.photoMarkers.addLayer(mapView.currentPositionMarker);
 
       // Add current location preview card
-      panelView.renderLocationCard(state.currentLatLng);
+      panelView.renderLocationCard([latitude, longitude]);
       mapView.currentPositionMarker.openPopup();
       mapView.flyToImageBounds(state.images);
+      panelView.checkSubmitBtn(state.images.length);
     } catch (e) {
       console.error(e);
       alert('User location not available'); // Replace with toast
@@ -114,15 +114,7 @@ const controlUserLocation = async function (e) {
       mapView.map.removeLayer(mapView.currentPositionMarker);
     }
     // Remove current location from coords array
-    state.images = state.images.filter(
-      (image) =>
-        !(
-          image.latitude === state.currentLatLng[0] &&
-          image.longitude === state.currentLatLng[1]
-        )
-    );
-    // Remove current lat long
-    state.currentLatLng.length = 0;
+    state.images = state.images.filter(image => !image.currentPosition);
 
     // Set map view based on existing images
     if (state.images.length > 0) {
@@ -134,26 +126,21 @@ const controlUserLocation = async function (e) {
     panelView.imageList.removeChild(panelView.locationPreviewCard);
     // Remove current position marker
     mapView.photoMarkers.removeLayer(mapView.currentPositionMarker);
+    panelView.checkSubmitBtn(state.images.length);
     return state.images;
   }
 };
 const controlLocationPreviewClick = function () {
-  mapView.map.flyTo([state.currentLatLng[0], state.currentLatLng[1]], 15);
+  let currentCoords = state.images.find(image => image.currentPosition);
+  mapView.map.flyTo([currentCoords.latitude, currentCoords.longitude], 15);
 };
 
 const controlRemoveLocationPreview = function () {
   // Remove current location from coords array
-  state.images = state.images.filter(
-    (image) =>
-      !(
-        image.latitutde === state.currentLatLng[0] &&
-        image.longitude === state.currentLatLng[1]
-      )
-  );
-  // Remove current lat long
-  state.currentLatLng.length = 0;
+  state.images = state.images.filter(image => !image.currentPosition);
   // Remove location preview card
   panelView.imageList.removeChild(panelView.locationPreviewCard);
+  panelView.checkSubmitBtn(state.images.length);
   // Remove map marker for current location
   if (mapView.map.hasLayer(mapView.currentPositionMarker)) {
     mapView.map.removeLayer(mapView.currentPositionMarker);
@@ -164,7 +151,7 @@ const controlRemoveLocationPreview = function () {
 const controlImagesOrder = function () {
   const sortOrder = [
     ...panelView.imageList.querySelectorAll('.preview__card'),
-  ].map((el) => +el.getAttribute('data-img-id'));
+  ].map((el) => el.getAttribute('data-img-id'));
   state.images = state.images
     .sort((a, b) => sortOrder.indexOf(a.imgId) - sortOrder.indexOf(b.imgId))
     .map((img, i) => ({ ...img, imgOrder: i }));
@@ -176,7 +163,7 @@ const controlSubmit = async function (transportMode) {
   state.routeData = routeData;
   mapView.flyToImageBounds(state.images);
   mapView.renderRouteLine(state.routeData, state.transportMode);
-  panelView.renderRoutePreviewCard(state.routeData);
+  panelView.renderRoutePreviewCard(state.routeData, state.transportMode);
 };
 
 const controlClear = function () {
@@ -191,11 +178,11 @@ const controlClear = function () {
   // Remove all image previews
   panelView.imageList.replaceChildren();
   !!panelView.routePreviewCard && panelView.routePreviewCard.remove();
-  panelView.routePanel.remove();
+  !!panelView.routePanel && panelView.routePanel.remove();
 
   // reset to default coords/world view
   panelView.form.reset();
-  panelView._submitBtn.disabled = true;
+  panelView.checkSubmitBtn(state.images.length);
 };
 
 export const init = function () {
