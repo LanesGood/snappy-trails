@@ -76,6 +76,7 @@ const controlRemoveImage = function (i) {
   );
   state.images = state.images.filter((img) => img.imgId !== i);
   mapView.clearRouteLine();
+  panelView.removeRouteInfo();
   panelView.checkSubmitBtn(state.images.length);
 };
 
@@ -127,6 +128,8 @@ const controlUserLocation = async function (e) {
     // Remove current position marker
     mapView.photoMarkers.removeLayer(mapView.currentPositionMarker);
     panelView.checkSubmitBtn(state.images.length);
+    panelView.removeRouteInfo();
+    mapView.clearRouteLine();
     return state.images;
   }
 };
@@ -140,6 +143,8 @@ const controlRemoveLocationPreview = function () {
   state.images = state.images.filter(image => !image.currentPosition);
   // Remove location preview card
   panelView.imageList.removeChild(panelView.locationPreviewCard);
+  panelView.removeRouteInfo();
+  mapView.clearRouteLine();
   panelView.checkSubmitBtn(state.images.length);
   // Remove map marker for current location
   if (mapView.map.hasLayer(mapView.currentPositionMarker)) {
@@ -158,6 +163,8 @@ const controlImagesOrder = function () {
 };
 
 const controlSubmit = async function (transportMode) {
+  panelView.removeRouteInfo();
+  mapView.clearRouteLine();
   state.transportMode = transportMode;
   const routeData = await model.getRoute(state.transportMode);
   state.routeData = routeData;
@@ -177,8 +184,7 @@ const controlClear = function () {
   mapView.flyToDefaultCoords();
   // Remove all image previews
   panelView.imageList.replaceChildren();
-  !!panelView.routePreviewCard && panelView.routePreviewCard.remove();
-  !!panelView.routePanel && panelView.routePanel.remove();
+  panelView.removeRouteInfo();
 
   // reset to default coords/world view
   panelView.form.reset();

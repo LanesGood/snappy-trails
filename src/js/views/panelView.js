@@ -369,6 +369,10 @@ class PanelView {
   checkSubmitBtn(numImages) {
     this._submitBtn.disabled = numImages >= 2 ? false : true;
   }
+  removeRouteInfo(){
+    !!this.routePreviewCard && this.routePreviewCard.remove();
+    !!this.routePanel && this.routePanel.remove();
+  }
 }
 
 export default new PanelView();
