@@ -28,8 +28,7 @@ const controlAddFiles = async function (fileList) {
           longitude,
         };
 
-        state.images.push(newImage);
-
+        model.addImage(newImage)
         mapView.renderPhotoMarker(latitude, longitude, file, imgId);
         panelView.renderPreviewCard(newImage);
         mapView.flyToImageBounds(state.images);
@@ -75,7 +74,7 @@ const controlRemoveImage = function (i) {
   panelView.imageList.removeChild(
     panelView.imageList.querySelector(`[data-img-id="${i}"]`)
   );
-  state.images = state.images.filter((img) => img.imgId !== i);
+  model.removeImage('imgId', i)
   mapView.clearRouteLine();
   panelView.removeRouteInfo();
   panelView.checkSubmitBtn(state.images.length);
@@ -88,7 +87,7 @@ const controlUserLocation = async function (e) {
         coords: { latitude, longitude },
       } = await model.getPosition();
       // Add current location to images array
-      state.images.push({
+      model.addImage({
         file: null,
         imgId: 'currentCoords',
         imgOrder: 1000,
@@ -116,7 +115,7 @@ const controlUserLocation = async function (e) {
       mapView.map.removeLayer(mapView.currentPositionMarker);
     }
     // Remove current location from coords array
-    state.images = state.images.filter(image => !image.currentPosition);
+    model.removeImage('currentPosition', true)
 
     // Set map view based on existing images
     if (state.images.length > 0) {
@@ -141,7 +140,7 @@ const controlLocationPreviewClick = function () {
 
 const controlRemoveLocationPreview = function () {
   // Remove current location from coords array
-  state.images = state.images.filter(image => !image.currentPosition);
+  model.removeImage('currentPosition', true)
   // Remove location preview card
   panelView.imageList.removeChild(panelView.locationPreviewCard);
   panelView.removeRouteInfo();
@@ -158,9 +157,7 @@ const controlImagesOrder = function () {
   const sortOrder = [
     ...panelView.imageList.querySelectorAll('.preview__card'),
   ].map((el) => el.getAttribute('data-img-id'));
-  state.images = state.images
-    .sort((a, b) => sortOrder.indexOf(a.imgId) - sortOrder.indexOf(b.imgId))
-    .map((img, i) => ({ ...img, imgOrder: i }));
+  model.sortImages(sortOrder)
 };
 
 const controlSubmit = async function (transportMode) {
