@@ -93,6 +93,7 @@
   border-radius: 0;
   margin: 0;
   box-shadow: none;
+  grid-template-columns: 6.5rem 1fr 1fr;
   &:hover {
     transform: none;
     box-shadow: none;
@@ -103,6 +104,11 @@
   }
   &:before {
     content: none;
+  }
+  h4:last-of-type {
+    text-transform: uppercase;
+    justify-self: end;
+    align-self: center;
   }
 }
 

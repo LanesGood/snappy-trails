@@ -28,8 +28,7 @@ const controlAddFiles = async function (fileList) {
           longitude,
         };
 
-        state.images.push(newImage);
-
+        model.addImage(newImage)
         mapView.renderPhotoMarker(latitude, longitude, file, imgId);
         panelView.renderPreviewCard(newImage);
         mapView.flyToImageBounds(state.images);
@@ -43,9 +42,17 @@ const controlAddFiles = async function (fileList) {
   }
 
   mapView.clearRouteLine();
-  panelView.input.value = '';
+  panelView.removeRouteInfo()
+  panelView.fileInput.value = '';
   panelView.checkSubmitBtn(state.images.length);
 };
+
+const controlTransportMode = function(e){
+  mapView.clearRouteLine();
+  panelView.removeRouteInfo()
+  let transportMode = e.target.value;
+  model.setTransportMode(transportMode);
+}
 
 const controlPreviewClick = function (i) {
   const img = state.images.find((img) => img.imgId === i);
@@ -74,8 +81,9 @@ const controlRemoveImage = function (i) {
   panelView.imageList.removeChild(
     panelView.imageList.querySelector(`[data-img-id="${i}"]`)
   );
-  state.images = state.images.filter((img) => img.imgId !== i);
+  model.removeImage('imgId', i)
   mapView.clearRouteLine();
+  panelView.removeRouteInfo();
   panelView.checkSubmitBtn(state.images.length);
 };
 
@@ -86,7 +94,7 @@ const controlUserLocation = async function (e) {
         coords: { latitude, longitude },
       } = await model.getPosition();
       // Add current location to images array
-      state.images.push({
+      model.addImage({
         file: null,
         imgId: 'currentCoords',
         imgOrder: 1000,
@@ -114,7 +122,7 @@ const controlUserLocation = async function (e) {
       mapView.map.removeLayer(mapView.currentPositionMarker);
     }
     // Remove current location from coords array
-    state.images = state.images.filter(image => !image.currentPosition);
+    model.removeImage('currentPosition', true)
 
     // Set map view based on existing images
     if (state.images.length > 0) {
@@ -127,6 +135,8 @@ const controlUserLocation = async function (e) {
     // Remove current position marker
     mapView.photoMarkers.removeLayer(mapView.currentPositionMarker);
     panelView.checkSubmitBtn(state.images.length);
+    panelView.removeRouteInfo();
+    mapView.clearRouteLine();
     return state.images;
   }
 };
@@ -137,9 +147,11 @@ const controlLocationPreviewClick = function () {
 
 const controlRemoveLocationPreview = function () {
   // Remove current location from coords array
-  state.images = state.images.filter(image => !image.currentPosition);
+  model.removeImage('currentPosition', true)
   // Remove location preview card
   panelView.imageList.removeChild(panelView.locationPreviewCard);
+  panelView.removeRouteInfo();
+  mapView.clearRouteLine();
   panelView.checkSubmitBtn(state.images.length);
   // Remove map marker for current location
   if (mapView.map.hasLayer(mapView.currentPositionMarker)) {
@@ -152,13 +164,13 @@ const controlImagesOrder = function () {
   const sortOrder = [
     ...panelView.imageList.querySelectorAll('.preview__card'),
   ].map((el) => el.getAttribute('data-img-id'));
-  state.images = state.images
-    .sort((a, b) => sortOrder.indexOf(a.imgId) - sortOrder.indexOf(b.imgId))
-    .map((img, i) => ({ ...img, imgOrder: i }));
+  model.sortImages(sortOrder)
 };
 
 const controlSubmit = async function (transportMode) {
-  state.transportMode = transportMode;
+  panelView.removeRouteInfo();
+  mapView.clearRouteLine();
+  model.setTransportMode(transportMode);
   const routeData = await model.getRoute(state.transportMode);
   state.routeData = routeData;
   mapView.flyToImageBounds(state.images);
@@ -177,8 +189,7 @@ const controlClear = function () {
   mapView.flyToDefaultCoords();
   // Remove all image previews
   panelView.imageList.replaceChildren();
-  !!panelView.routePreviewCard && panelView.routePreviewCard.remove();
-  !!panelView.routePanel && panelView.routePanel.remove();
+  panelView.removeRouteInfo();
 
   // reset to default coords/world view
   panelView.form.reset();
@@ -192,6 +203,7 @@ export const init = function () {
   mapView.render();
   panelView.addHandlerUserLocation(controlUserLocation);
   panelView.addHandlerFileInput(controlAddFiles);
+  panelView.addHandlerTransportButton(controlTransportMode);
   panelView.addHandlerDropInput(controlAddFiles);
   panelView.addHandlerPreviewClick(controlPreviewClick);
   panelView.addHandlerDragPreviewCard(controlImagesOrder);

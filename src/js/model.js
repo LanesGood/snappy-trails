@@ -4,7 +4,21 @@ export const state = {
   transportMode: '',
   routeData: {},
 };
-
+export function addImage(image) {
+  state.images.push(image);
+}
+export function removeImage(key, value) {
+  state.images = state.images.filter((img) => img[key] !== value);
+  console.log(state);
+}
+export function sortImages(order) {
+  state.images = state.images
+    .sort((a, b) => order.indexOf(a.imgId) - order.indexOf(b.imgId))
+    .map((img, i) => ({ ...img, imgOrder: i }));
+}
+export function setTransportMode(mode) {
+  state.transportMode = mode;
+}
 // Extract image EXIF data in a promise
 export function getExifData(file) {
   return new Promise(function (resolve, reject) {
