@@ -16,6 +16,9 @@ export function sortImages(order) {
     .sort((a, b) => order.indexOf(a.imgId) - order.indexOf(b.imgId))
     .map((img, i) => ({ ...img, imgOrder: i }));
 }
+export function setTransportMode(mode) {
+  state.transportMode = mode;
+}
 // Extract image EXIF data in a promise
 export function getExifData(file) {
   return new Promise(function (resolve, reject) {

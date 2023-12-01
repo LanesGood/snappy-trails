@@ -43,9 +43,16 @@ const controlAddFiles = async function (fileList) {
 
   mapView.clearRouteLine();
   panelView.removeRouteInfo()
-  panelView.input.value = '';
+  panelView.fileInput.value = '';
   panelView.checkSubmitBtn(state.images.length);
 };
+
+const controlTransportMode = function(e){
+  mapView.clearRouteLine();
+  panelView.removeRouteInfo()
+  let transportMode = e.target.value;
+  model.setTransportMode(transportMode);
+}
 
 const controlPreviewClick = function (i) {
   const img = state.images.find((img) => img.imgId === i);
@@ -163,7 +170,7 @@ const controlImagesOrder = function () {
 const controlSubmit = async function (transportMode) {
   panelView.removeRouteInfo();
   mapView.clearRouteLine();
-  state.transportMode = transportMode;
+  model.setTransportMode(transportMode);
   const routeData = await model.getRoute(state.transportMode);
   state.routeData = routeData;
   mapView.flyToImageBounds(state.images);
@@ -196,6 +203,7 @@ export const init = function () {
   mapView.render();
   panelView.addHandlerUserLocation(controlUserLocation);
   panelView.addHandlerFileInput(controlAddFiles);
+  panelView.addHandlerTransportButton(controlTransportMode);
   panelView.addHandlerDropInput(controlAddFiles);
   panelView.addHandlerPreviewClick(controlPreviewClick);
   panelView.addHandlerDragPreviewCard(controlImagesOrder);

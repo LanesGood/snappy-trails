@@ -1,7 +1,8 @@
 import { miliToTime, round, toMiles, ROUTE_MODES } from '../helpers';
 class PanelView {
   uploadForm = document.querySelector('#upload-form');
-  input = document.querySelector('#fileInput');
+  fileInput = document.querySelector('#fileInput');
+  transportButtons = document.querySelectorAll('input[name=transport-mode]');
   _submitBtn = document.querySelector('#submit-route-btn');
   _clearBtn = document.querySelector('#clear-btn');
   _userLocationInput = document.querySelector('#user-location');
@@ -12,11 +13,18 @@ class PanelView {
   locationPreviewCard;
 
   addHandlerFileInput(handler) {
-    this.input.addEventListener('change', async function (e) {
+    this.fileInput.addEventListener('change', async function (e) {
       const fileList = this.files;
       if (!fileList.length) return;
       handler(fileList);
     });
+  }
+  addHandlerTransportButton(handler) {
+    this.transportButtons.forEach((button) =>
+      button.addEventListener('click', function (e) {
+        handler(e)
+      })
+    );
   }
   // Drag and drop functions for file upload
   addHandlerDropInput(handler) {
@@ -369,7 +377,7 @@ class PanelView {
   checkSubmitBtn(numImages) {
     this._submitBtn.disabled = numImages >= 2 ? false : true;
   }
-  removeRouteInfo(){
+  removeRouteInfo() {
     !!this.routePreviewCard && this.routePreviewCard.remove();
     !!this.routePanel && this.routePanel.remove();
   }
