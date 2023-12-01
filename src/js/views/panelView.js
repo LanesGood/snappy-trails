@@ -244,7 +244,7 @@ class PanelView {
     previewCard.appendChild(previewCardHeader);
     previewCard.appendChild(previewCardRemoveBtn);
     previewCard.appendChild(previewCardText);
-    
+
     this.imageList.insertAdjacentElement('beforeend', previewCard);
   }
   renderRoutePreviewCard(routeData, transportMode) {
@@ -270,6 +270,7 @@ class PanelView {
     <span><h4>${routeTime}</h4>
     <p>${round(toMiles(routeDistance), 100)} mi</p>
     </span>
+    <h4>Details  ➡</h4>
     `;
   }
   renderRoutePanel(routeData, transportMode) {
