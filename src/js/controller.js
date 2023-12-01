@@ -43,6 +43,7 @@ const controlAddFiles = async function (fileList) {
   }
 
   mapView.clearRouteLine();
+  panelView.removeRouteInfo()
   panelView.input.value = '';
   panelView.checkSubmitBtn(state.images.length);
 };
