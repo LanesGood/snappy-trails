@@ -1,7 +1,7 @@
 import { ConvertDMSToDD } from './helpers.js';
 export const state = {
   images: [],
-  transportMode: '',
+  transportMode: 'foot',
   routeData: {},
 };
 export function addImage(image) {
@@ -9,7 +9,6 @@ export function addImage(image) {
 }
 export function removeImage(key, value) {
   state.images = state.images.filter((img) => img[key] !== value);
-  console.log(state);
 }
 export function sortImages(order) {
   state.images = state.images
