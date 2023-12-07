@@ -3,7 +3,6 @@ class PanelView {
   uploadForm = document.querySelector('#upload-form');
   fileInput = document.querySelector('#fileInput');
   transportButtons = document.querySelectorAll('input[name=transport-mode]');
-  _submitBtn = document.querySelector('#submit-route-btn');
   _clearBtn = document.querySelector('#clear-btn');
   _userLocationInput = document.querySelector('#user-location');
   imageList = document.querySelector('#image_list');
@@ -374,9 +373,6 @@ class PanelView {
           ? this.renderLocationCard([img.latitude, img.longitude])
           : this.renderPreviewCard(img)
       );
-  }
-  checkSubmitBtn(numImages) {
-    this._submitBtn.disabled = numImages >= 2 ? false : true;
   }
   removeRouteInfo() {
     !!this.routePreviewCard && this.routePreviewCard.remove();
