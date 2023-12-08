@@ -1,4 +1,5 @@
 import { ConvertDMSToDD } from './helpers.js';
+const { GRAPHHOPPER_KEY } = process.env;
 export const state = {
   images: [],
   transportMode: 'foot',
@@ -66,7 +67,7 @@ export async function getRoute(transportMode) {
       .sort((a, b) => a.imgOrder - b.imgOrder)
       .map(({ latitude, longitude }) => [+longitude, +latitude]);
     const query = new URLSearchParams({
-      key: 'db56c0cf-613e-456d-baea-46650066da62', // remove from github
+      key: GRAPHHOPPER_KEY,
     }).toString();
     const res = await fetch(`https://graphhopper.com/api/1/route?${query}`, {
       method: 'POST',
