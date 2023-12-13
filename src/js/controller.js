@@ -18,7 +18,8 @@ const controlAddFiles = async function (fileList) {
 
       try {
         const exifData = await model.getExifData(file);
-        const { latitude, longitude } = exifData;
+        const imageData = model.prepareImageData(exifData)
+        const { latitude, longitude } = imageData;
 
         const newImage = {
           file,
@@ -34,7 +35,6 @@ const controlAddFiles = async function (fileList) {
         mapView.flyToImageBounds(state.images);
       } catch (e) {
         console.error(e);
-        alert('Could not extract location data for this image');
       }
     } else {
       alert(`${file.name} is already in the destination list`);

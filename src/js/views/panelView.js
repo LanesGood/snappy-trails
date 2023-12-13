@@ -21,7 +21,7 @@ class PanelView {
   addHandlerTransportButton(handler) {
     this.transportButtons.forEach((button) =>
       button.addEventListener('click', function (e) {
-        handler(e)
+        handler(e);
       })
     );
   }
@@ -218,26 +218,43 @@ class PanelView {
     const previewImage = document.createElement('img');
     previewImage.classList.add('preview__image');
     previewImage.src = URL.createObjectURL(file);
-
-    // Convert image date from exif data format to javascript format
-    const [year, month, day, hours, minutes, seconds] =
-      exifdata.DateTime.split(/[: ]/);
-    const dateObject = new Date(year, month - 1, day, hours, minutes, seconds);
+    previewImage.onload = () => {
+      URL.revokeObjectURL(previewImage.src);
+    };
 
     previewCardText.innerHTML = `
-
       <dl>
-        <dt>Date:</dt><dd>${dateObject.toLocaleDateString()}</dd>
-        <dt>Time:</dt><dd>${dateObject.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        })}</dd>
         <dt>lat, lng: </dt><dd>${latitude.toFixed(2)}, ${longitude.toFixed(
       2
     )}</dd>
         <dt>Camera:</dd><dd> ${exifdata.Make} ${exifdata.Model}</dd>
       </dl>
     `;
+    if (exifdata.DateTime) {
+      // Convert image date from exif data format to javascript format
+      const [year, month, day, hours, minutes, seconds] =
+        exifdata.DateTime.split(/[: ]/);
+      const dateObject = new Date(
+        year,
+        month - 1,
+        day,
+        hours,
+        minutes,
+        seconds
+      );
+      dateObject &&
+        previewCardText.insertAdjacentHTML(
+          'afterbegin',
+          `<dl>
+            <dt>Date:</dt><dd>${dateObject.toLocaleDateString()}</dd>
+            <dt>Time:</dt><dd>${dateObject.toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}</dd>
+          </dl>
+          `
+        );
+    }
     // Append card items
     previewCardHeader.appendChild(previewImage);
     previewCard.appendChild(previewCardHeader);

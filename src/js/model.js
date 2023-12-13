@@ -20,45 +20,54 @@ export function setTransportMode(mode) {
   state.transportMode = mode;
 }
 // Extract image EXIF data in a promise
-export function getExifData(file) {
-  return new Promise(function (resolve, reject) {
+export async function getExifData(file) {
+  file.exifData = null;
+  const exifData = await new Promise((resolve, reject) =>
     EXIF.getData(file, function () {
-      const {
-        DateTime,
-        GPSImgDirection,
-        GPSImgDirectionRef,
-        GPSLatitudeRef,
-        GPSLatitude,
-        GPSLongitudeRef,
-        GPSLongitude,
-        Make,
-        Model,
-      } = EXIF.getAllTags(this);
-      const latitude = ConvertDMSToDD(
-        GPSLatitude[0],
-        GPSLatitude[1],
-        GPSLatitude[2],
-        GPSLatitudeRef
+      resolve({
+        Make: EXIF.getTag(this, 'Make'),
+        DateTime: EXIF.getTag(this, 'DateTime'),
+        GPSLatitudeRef: EXIF.getTag(this, 'GPSLatitudeRef'),
+        GPSLatitude: EXIF.getTag(this, 'GPSLatitude'),
+        GPSLongitudeRef: EXIF.getTag(this, 'GPSLongitudeRef'),
+        GPSLongitude: EXIF.getTag(this, 'GPSLongitude'),
+      });
+      reject(
+        new Error('There was an error extracting EXIF data from this image')
       );
-      const longitude = ConvertDMSToDD(
-        GPSLongitude[0],
-        GPSLongitude[1],
-        GPSLongitude[2],
-        GPSLongitudeRef
-      );
-      const imageData = {
-        DateTime,
-        GPSImgDirection,
-        GPSImgDirectionRef,
-        latitude,
-        longitude,
-        Make,
-        Model,
-      };
-      resolve(imageData);
-      reject(new Error('There was an error '));
-    });
-  });
+    })
+  );
+  return exifData;
+}
+export function prepareImageData(tags) {
+  const {
+    DateTime,
+    GPSLatitudeRef,
+    GPSLatitude,
+    GPSLongitudeRef,
+    GPSLongitude,
+  } = tags;
+  if (!GPSLatitudeRef || !GPSLatitude) {
+    throw new Error('This image has no location data');
+  }
+  const latitude = ConvertDMSToDD(
+    GPSLatitude[0],
+    GPSLatitude[1],
+    GPSLatitude[2],
+    GPSLatitudeRef
+  );
+  const longitude = ConvertDMSToDD(
+    GPSLongitude[0],
+    GPSLongitude[1],
+    GPSLongitude[2],
+    GPSLongitudeRef
+  );
+  const imageData = {
+    DateTime,
+    latitude,
+    longitude,
+  };
+  return imageData;
 }
 
 export async function getRoute(transportMode) {
