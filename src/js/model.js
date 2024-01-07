@@ -33,13 +33,13 @@ export async function getExifData(file) {
         GPSLongitude: EXIF.getTag(this, 'GPSLongitude'),
       });
       reject(
-        new Error('There was an error extracting EXIF data from this image')
+        new Error(file.name + ': There was an error extracting EXIF data from this image')
       );
     })
   );
   return exifData;
 }
-export function prepareImageData(tags) {
+export function prepareImageData(tags, filename) {
   const {
     DateTime,
     GPSLatitudeRef,
@@ -48,7 +48,7 @@ export function prepareImageData(tags) {
     GPSLongitude,
   } = tags;
   if (!GPSLatitudeRef || !GPSLatitude) {
-    throw new Error('This image has no location data');
+    throw new Error(filename + ' has no location data');
   }
   const latitude = ConvertDMSToDD(
     GPSLatitude[0],
@@ -93,8 +93,7 @@ export async function getRoute(transportMode) {
     if (!res.ok) throw new Error(`${data.message}`);
     return data;
   } catch (error) {
-    console.error(error);
-    return error;
+    throw new Error(error);
   }
 }
 

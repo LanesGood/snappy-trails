@@ -391,6 +391,22 @@ class PanelView {
           : this.renderPreviewCard(img)
       );
   }
+  renderToast(message, status = 'error') {
+    const toast = document.createElement('div');
+    toast.innerHTML = message;
+    toast.classList.add('toast', `toast--${status}`);
+    const otherToasts = document.querySelectorAll('.toast');
+    if(otherToasts) {
+      let offset = '6rem';
+      for(let i = 0; i < otherToasts.length; i++){
+        toast.style.bottom = `calc(${i + 1} * ${offset})`;
+      }
+    }
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('toast--show'), 500);
+    setTimeout(() => toast.classList.remove('toast--show'), 5000);
+    setTimeout(() => document.body.removeChild(toast), 5500);
+  }
   removeRouteInfo() {
     !!this.routePreviewCard && this.routePreviewCard.remove();
     !!this.routePanel && this.routePanel.remove();
