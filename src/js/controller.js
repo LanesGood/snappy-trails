@@ -18,7 +18,8 @@ const controlAddFiles = async function (fileList) {
 
       try {
         const exifData = await model.getExifData(file);
-        const { latitude, longitude } = exifData;
+        const imageData = model.prepareImageData(exifData, file.name)
+        const { latitude, longitude } = imageData;
 
         const newImage = {
           file,
@@ -33,11 +34,11 @@ const controlAddFiles = async function (fileList) {
         panelView.renderPreviewCard(newImage);
         mapView.flyToImageBounds(state.images);
       } catch (e) {
+        panelView.renderToast(e)
         console.error(e);
-        alert('Could not extract location data for this image');
       }
     } else {
-      alert(`${file.name} is already in the destination list`);
+      panelView.renderToast(`${file.name} is already in the destination list`, 'info');
     }
   }
 
@@ -115,7 +116,7 @@ const controlUserLocation = async function (e) {
       controlSubmit(state.transportMode);
     } catch (e) {
       console.error(e);
-      alert('User location not available'); // Replace with toast
+      panelView.renderToast(e.message);
     }
   } else if (!e.target.checked) {
     // Remove current location marker
@@ -174,11 +175,15 @@ const controlSubmit = async function (transportMode) {
   panelView.removeRouteInfo();
   mapView.clearRouteLine();
   model.setTransportMode(transportMode);
-  const routeData = await model.getRoute(state.transportMode);
-  state.routeData = routeData;
-  mapView.flyToImageBounds(state.images);
-  mapView.renderRouteLine(state.routeData, state.transportMode);
-  panelView.renderRoutePreviewCard(state.routeData, state.transportMode);
+  try {
+    const routeData = await model.getRoute(state.transportMode);
+    state.routeData = routeData;
+    mapView.flyToImageBounds(state.images);
+    mapView.renderRouteLine(state.routeData, state.transportMode);
+    panelView.renderRoutePreviewCard(state.routeData, state.transportMode);
+  } catch(e) {
+    panelView.renderToast(e);
+  }
 };
 
 const controlClear = function () {
