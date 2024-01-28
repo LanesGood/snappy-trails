@@ -29,3 +29,8 @@ export const ROUTE_MODES = {
   bike: 'Bike',
   car: 'Car'
 };
+export const ROUTE_COLORS = {
+  foot: '#0b6683',
+  bike: '#199d3c',
+  car: '#892509'
+}
